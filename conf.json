@@ -1,0 +1,7 @@
+{
+  "port":"5145",
+  "trackRoots": ["http://127.0.0.1:5143"],
+  "gatewayTimeout": 250,
+  "maxExecTime":60,
+  "Log":false
+}
