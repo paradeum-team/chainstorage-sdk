@@ -50,7 +50,9 @@ type Configuration struct {
 
 	PProf bool `profile:"pprof" profileDefault:"false" json:"pprof"`
 
-	LinkedStorageApiBaseAddress string `profile:"linkedStorageApiBaseAddress" profileDefault:"http://127.0.0.1:8821" json:"linkedStorageApiBaseAddress"`
+	ChainStorageApiBaseAddress string `profile:"chainStorageApiBaseAddress" profileDefault:"http://127.0.0.1:8821" json:"chainStorageApiBaseAddress"`
+
+	CarFileGenerationPath string `profile:"carFileGenerationPath" profileDefault:"./temp/carfile" json:"carFileGenerationPath"`
 }
 
 type LoggerConf struct {

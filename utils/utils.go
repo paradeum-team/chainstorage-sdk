@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"chainstorage-sdk/common/dict"
 	"chainstorage-sdk/conf"
 	"crypto/md5"
 	"fmt"
@@ -205,4 +206,9 @@ const (
 
 func (e Mode) String() string {
 	return string(e)
+}
+
+func CurrentDate() string {
+	timeStr := time.Now().Format(dict.SysTimeFmt4Date) //当前时间的字符串，2006-01-02 15:04:05据说是golang的诞生时间，固定写法
+	return timeStr
 }

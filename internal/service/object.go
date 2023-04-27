@@ -42,7 +42,7 @@ func GetObjectList(bucketId int, objectItem string, pageSize, pageIndex int) (mo
 
 	// 请求Url
 	urlQuery = strings.TrimSuffix(urlQuery, "&")
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/objects/search"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -89,7 +89,7 @@ func RemoveObject(objectIds []int) (model.ObjectRemoveResponse, error) {
 	}
 
 	// 请求Url
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/object"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -142,7 +142,7 @@ func RenameObject(objectId int, objectName string, isOverwrite bool) (model.Obje
 	}
 
 	// 请求Url
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := fmt.Sprintf("api/v1/object/name/%d", objectId)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -190,7 +190,7 @@ func MarkObject(objectId int, isMarked bool) (model.ObjectMarkResponse, error) {
 	}
 
 	// 请求Url
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := fmt.Sprintf("api/v1/object/mark/%d", objectId)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 

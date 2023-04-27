@@ -23,7 +23,8 @@ server:
   useField: rfs
   #性能监控+prometheus
   pprof: true
-  linkedStorageApiBaseAddress: http://127.0.0.1:8821
+  chainStorageApiBaseAddress: http://127.0.0.1:8821
+  carFileGenerationPath: ./temp/carfile
 
 
 leveldb:

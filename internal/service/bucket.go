@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ulule/deepcopier"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -42,7 +43,7 @@ func GetBucketList(bucketName string, pageSize, pageIndex int) (model.BucketPage
 
 	// 请求Url
 	urlQuery = strings.TrimSuffix(urlQuery, "&")
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/buckets"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -99,7 +100,7 @@ func CreateBucket(bucketName string, storageNetworkCode, bucketPrincipleCode int
 	}
 
 	// 请求Url
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/bucket"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -142,7 +143,7 @@ func EmptyBucket(bucketId int) (model.BucketEmptyResponse, error) {
 	}
 
 	// 请求Url
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/bucket/status/clean"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -172,7 +173,7 @@ func EmptyBucket(bucketId int) (model.BucketEmptyResponse, error) {
 }
 
 // 删除桶数据
-func RemoveBucket(bucketId int) (model.BucketRemoveResponse, error) {
+func RemoveBucket(bucketId int, autoEmptyBucketData bool) (model.BucketRemoveResponse, error) {
 	response := model.BucketRemoveResponse{}
 
 	// 参数设置
@@ -180,8 +181,18 @@ func RemoveBucket(bucketId int) (model.BucketRemoveResponse, error) {
 		return response, errors.New("请输入正确的桶ID.")
 	}
 
+	// 自动清空数据
+	if autoEmptyBucketData {
+		bucketEmptyResponse, err := EmptyBucket(bucketId)
+		if err != nil {
+			deepcopier.Copy(&bucketEmptyResponse).To(&response)
+			utils.LogError(fmt.Sprintf("API:RemoveBucket:EmptyBucket, bucketId:%d, bucketEmptyResponse:%+v, err:%+v\n", bucketId, bucketEmptyResponse, err))
+			return response, err
+		}
+	}
+
 	// 请求Url
-	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
 	apiPath := fmt.Sprintf("api/v1/bucket/%d", bucketId)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 

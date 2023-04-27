@@ -20,17 +20,17 @@ func main() {
 
 	// region 桶数据
 
-	// 获取桶数据列表
-	bucketName := ""
-	pageSize := 10
-	pageIndex := 1
-	response, err := service.GetBucketList(bucketName, pageSize, pageIndex)
-	if err != nil {
-		fmt.Printf("error:%+v\n", err)
-		return
-	}
-
-	fmt.Printf("response:%+v\n", response)
+	//// 获取桶数据列表
+	//bucketName := ""
+	//pageSize := 10
+	//pageIndex := 1
+	//response, err := service.GetBucketList(bucketName, pageSize, pageIndex)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//fmt.Printf("response:%+v\n", response)
 
 	//// 创建桶数据
 	//bucketName := "bucket3"
@@ -116,6 +116,15 @@ func main() {
 	////fmt.Printf("response:%+v\n", response)
 	//
 	//// endregion 对象数据
+
+	dataPath := "/Users/yuan/Downloads/1e00000000000080599b55478cd59e9bf0f2f15619d353c9a37520397edd3380977b32d28ec4593ce30e8508a0adef06316d2d812f4417c494c359bf9c365f84.txt"
+	response, err := service.UploadData(dataPath)
+	if err != nil {
+		fmt.Printf("error:%+v\n", err)
+		return
+	}
+
+	fmt.Printf("response:%+v\n", response)
 }
 
 //// 获取API-Key数据列表
@@ -138,7 +147,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := "api/v1/apiKeys"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -193,7 +202,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := "api/v1/buckets"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -242,7 +251,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := "api/v1/bucket"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -283,7 +292,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := "api/v1/bucket/status/clean"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -320,7 +329,7 @@ func main() {
 //	//todo: bucket id check?
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := fmt.Sprintf("api/v1/bucket/%d", bucketId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -379,7 +388,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := "api/v1/objects/search"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -423,7 +432,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := "api/v1/object"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -471,7 +480,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := fmt.Sprintf("api/v1/object/name/%d", objectId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -517,7 +526,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.LinkedStorageApiBaseAddress
+//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
 //	apiPath := fmt.Sprintf("api/v1/object/mark/%d", objectId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //

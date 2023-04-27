@@ -149,19 +149,19 @@ func init() {
 	//check uploadBoath
 	UploadFieldModel = Config.UploadFieldModel
 
-	//check linked-storage-api base address
-	if len(Config.LinkedStorageApiBaseAddress) > 0 {
-		linkedStorageApiBaseAddress := Config.LinkedStorageApiBaseAddress
-		if !strings.HasPrefix(linkedStorageApiBaseAddress, "http") {
-			fmt.Println("ERROR: invalid linked-storage-api base address in Configuration file, linked-storage-api base address must be a valid http/https url, exiting")
+	//check chain-storage-api base address
+	if len(Config.ChainStorageApiBaseAddress) > 0 {
+		chainStorageApiBaseAddress := Config.ChainStorageApiBaseAddress
+		if !strings.HasPrefix(chainStorageApiBaseAddress, "http") {
+			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
 			os.Exit(1)
 		}
 
-		if !strings.HasSuffix(linkedStorageApiBaseAddress, "/") {
-			Config.LinkedStorageApiBaseAddress += "/"
+		if !strings.HasSuffix(chainStorageApiBaseAddress, "/") {
+			Config.ChainStorageApiBaseAddress += "/"
 		}
 	} else {
-		fmt.Println("ERROR: no linked-storage-api base address provided in Configuration file, at least 1 valid http/https linked-storage-api base address must be given, exiting")
+		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
 		os.Exit(1)
 	}
 
