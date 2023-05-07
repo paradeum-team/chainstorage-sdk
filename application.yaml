@@ -25,6 +25,8 @@ server:
   pprof: true
   chainStorageApiBaseAddress: http://127.0.0.1:8821
   carFileGenerationPath: ./temp/carfile
+  carFileShardingThreshold: 104857600
+
 
 
 leveldb:

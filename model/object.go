@@ -66,3 +66,15 @@ type ObjectMarkResponse struct {
 	Status    string      `json:"status,omitempty"`
 	Data      interface{} `json:"data,omitempty"`
 }
+
+type ObjectExistResponse struct {
+	RequestId string           `json:"requestId,omitempty"`
+	Code      int32            `json:"code,omitempty"`
+	Msg       string           `json:"msg,omitempty"`
+	Status    string           `json:"status,omitempty"`
+	Data      ObjectExistCheck `json:"data,omitempty"`
+}
+
+type ObjectExistCheck struct {
+	IsExist bool `json:"isExist"`
+}

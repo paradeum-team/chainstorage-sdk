@@ -2,7 +2,10 @@ package main
 
 import (
 	"chainstorage-sdk/internal/service"
+	"chainstorage-sdk/model"
+	"chainstorage-sdk/utils"
 	"fmt"
+	ipldfmt "github.com/ipfs/go-ipld-format"
 )
 
 func main() {
@@ -117,14 +120,142 @@ func main() {
 	//
 	//// endregion 对象数据
 
-	dataPath := "/Users/yuan/Downloads/1e00000000000080599b55478cd59e9bf0f2f15619d353c9a37520397edd3380977b32d28ec4593ce30e8508a0adef06316d2d812f4417c494c359bf9c365f84.txt"
-	response, err := service.UploadData(dataPath)
+	//dataPath := "/Users/yuan/Downloads/1e00000000000080599b55478cd59e9bf0f2f15619d353c9a37520397edd3380977b32d28ec4593ce30e8508a0adef06316d2d812f4417c494c359bf9c365f84.txt"
+	//dataPath := "/Users/yuan/Downloads/tmp"
+	//response, err := service.UploadData(dataPath)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//
+	//fmt.Printf("response:%+v\n", response)
+
+	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	//////dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
+	//err := service.GetCarDag(dataPath, "")
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//dataPath = "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
+	//err = service.GetCarDag(dataPath, "")
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+
+	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_chunk-0.car"
+	//err := service.GetCarDag(dataPath, "")
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+
+	//dataPath = "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_chunk-1.car"
+	//err = service.GetCarDag(dataPath, "")
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//dataPath = "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_chunk-2.car"
+	//err = service.GetCarDag(dataPath, "")
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+
+	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
+	//err := service.SliceBigCarFile(dataPath)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+
+	//linkContent := ipldfmt.Link{}
+	//err := service.parseCarDag(dataPath, &linkContent)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//fmt.Printf("linkContent:%+v\n", linkContent)
+
+	//objectCid := "bafybeibawqusphaqfn7c7b5hsr4wgmxud7qfhnmd2ntco7oqjnvmg5njfa"
+	//response, err := service.IsExistObjectByCid(objectCid)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//fmt.Printf("response:%+v\n", response)
+
+	// 引用对象
+	dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	linkContent := ipldfmt.Link{}
+	err := service.TempParseCarDag(dataPath, &linkContent)
 	if err != nil {
 		fmt.Printf("error:%+v\n", err)
 		return
 	}
 
+	cid := linkContent.Cid
+	size := linkContent.Size
+	name := linkContent.Name
+
+	carFileUploadReq := model.CarFileUploadReq{}
+	carFileUploadReq.BucketId = 18
+	carFileUploadReq.ObjectCid = cid.String()
+	carFileUploadReq.ObjectSize = int64(size)
+	carFileUploadReq.ObjectName = name
+	carFileUploadReq.FileDestination = dataPath
+	sha256, err := utils.GetFileSha256ByPath(dataPath)
+	if err != nil {
+		fmt.Printf("error:%+v\n", err)
+		return
+	}
+	carFileUploadReq.RawSha256 = sha256
+
+	response, err := service.ReferenceObject(&carFileUploadReq)
+	if err != nil {
+		fmt.Printf("error:%+v\n", err)
+		return
+	}
 	fmt.Printf("response:%+v\n", response)
+
+	//	// 普通上传
+	//	dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	//	linkContent := ipldfmt.Link{}
+	//	err := service.TempParseCarDag(dataPath, &linkContent)
+	//	if err != nil {
+	//		fmt.Printf("error:%+v\n", err)
+	//		return
+	//	}
+	//
+	//	cid := linkContent.Cid
+	//	size := linkContent.Size
+	//	name := linkContent.Name
+	//
+	//	carFileUploadReq := model.CarFileUploadReq{}
+	//	carFileUploadReq.BucketId = 18
+	//	carFileUploadReq.ObjectCid = cid.String()
+	//	carFileUploadReq.ObjectSize = int64(size)
+	//	carFileUploadReq.ObjectName = name
+	//	carFileUploadReq.FileDestination = dataPath
+	//	sha256, err := utils.GetFileSha256ByPath(dataPath)
+	//	if err != nil {
+	//		fmt.Printf("error:%+v\n", err)
+	//		return
+	//	}
+	//	carFileUploadReq.RawSha256 = sha256
+	//
+	//	response, err := service.UploadCarFile(&carFileUploadReq)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//fmt.Printf("response:%+v\n", response)
 }
 
 //// 获取API-Key数据列表

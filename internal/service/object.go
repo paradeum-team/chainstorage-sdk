@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ipfs/go-cid"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -240,6 +241,53 @@ func checkObjectName(objectName string) error {
 	}
 
 	return nil
+}
+
+// 根据CID检查是否已经存在Object
+func IsExistObjectByCid(objectCid string) (model.ObjectExistResponse, error) {
+	response := model.ObjectExistResponse{}
+
+	// 参数设置
+	if len(objectCid) <= 0 {
+		return response, errors.New("请输入正确的对象CID.")
+	}
+
+	// CID检查
+	_, err := cid.Decode(objectCid)
+	if err != nil {
+		return response, errors.New("请输入正确的对象CID.")
+	}
+
+	urlQuery := url.QueryEscape(objectCid)
+
+	// 请求Url
+	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
+	apiPath := fmt.Sprintf("api/v1/object/existCid/%s", urlQuery)
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := client.RestyGet(apiUrl)
+	if err != nil {
+		utils.LogError(fmt.Sprintf("API:IsExistObjectByCid:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		utils.LogError(fmt.Sprintf("API:IsExistObjectByCid:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		utils.LogError(fmt.Sprintf("API:IsExistObjectByCid:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
 }
 
 // endregion 对象数据
