@@ -24,6 +24,7 @@ import (
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	"github.com/multiformats/go-multicodec"
 	"github.com/multiformats/go-multihash"
+	"github.com/ulule/deepcopier"
 	"io"
 	"net/http"
 	"os"
@@ -34,8 +35,10 @@ import (
 )
 
 // 上传数据
-func UploadData(bucketId int, dataPath string) (model.CarResponse, error) {
-	response := model.CarResponse{}
+// func UploadData(bucketId int, dataPath string) (model.CarResponse, error) {
+func UploadData(bucketId int, dataPath string) (model.ObjectCreateResponse, error) {
+	//response := model.CarResponse{}
+	response := model.ObjectCreateResponse{}
 
 	// 数据路径为空
 	if len(dataPath) == 0 {
@@ -119,8 +122,13 @@ func UploadData(bucketId int, dataPath string) (model.CarResponse, error) {
 	// CID存在，执行秒传操作
 	objectExistCheck := objectExistResponse.Data
 	if objectExistCheck.IsExist {
-		//todo:
-		ReferenceObject(&carFileUploadReq)
+		response, err := ReferenceObject(&carFileUploadReq)
+		if err != nil {
+			fmt.Printf("Error:%+v\n", err)
+			//return response, errors.New("执行秒传操作失败")
+		}
+
+		return response, err
 	}
 
 	// CAR文件大小，超过分片阈值
@@ -133,9 +141,13 @@ func UploadData(bucketId int, dataPath string) (model.CarResponse, error) {
 	}
 
 	// 普通上传
-	UploadCarFile(&carFileUploadReq)
+	response, err = UploadCarFile(&carFileUploadReq)
+	if err != nil {
+		fmt.Printf("Error:%+v\n", err)
+		//return response, errors.New("普通上传操作失败")
+	}
 
-	return response, nil
+	return response, err
 }
 
 // CreateCar creates a car
@@ -347,41 +359,90 @@ func SliceBigCarFile(carFilePath string) error {
 	return nil
 }
 
-func generateShardingCarFiles(carFilePath string) error {
-	bigCarFile, err := os.Open(carFilePath)
+// 生成CAR分片文件
+func generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarFileUploadReqs *[]model.CarFileUploadReq) error {
+	fileDestination := req.FileDestination
+
+	bigCarFile, err := os.Open(fileDestination)
 	if err != nil {
 		return err
 	}
 	defer bigCarFile.Close()
 
+	// CAR文件分片设置
 	targetSize := conf.Config.CarFileShardingThreshold * 10 //1024 * 1024     // 1MiB chunks
 	strategy := carbites.Treewalk                           // also carbites.Treewalk
 	spltr, _ := carbites.Split(bigCarFile, targetSize, strategy)
 
-	shardingCarFileDestinationList := []string{}
-	i := 1
+	//shardingCarFileDestinationList := []string{}
+	shardingNo := 1
+
 	for {
 		car, err := spltr.Next()
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
-			panic(err)
+			//panic(err)
+
+			fmt.Printf("Error:%+v\n", err)
+			return err
 		}
 
-		b, _ := io.ReadAll(car)
-		filename := fmt.Sprintf("_chunk.c%d", i)
-		//fileDestination := generateFileName(utils.CurrentDate()+"_", filename)
-		fileDestination := strings.Replace(carFilePath, filepath.Ext(carFilePath), filename, 1)
-		shardingCarFileDestinationList = append(shardingCarFileDestinationList, fileDestination)
-
-		//ioutil.WriteFile(fmt.Sprintf("chunk-%d.car", i), b, 0644)
-		err = os.WriteFile(fileDestination, b, 0644)
+		bytes, err := io.ReadAll(car)
 		if err != nil {
-			panic(err)
+			//panic(err)
+
+			fmt.Printf("Error:%+v\n", err)
+			return err
 		}
-		i++
+
+		// 设置文件名称
+		filename := fmt.Sprintf("_chunk.c%d", shardingNo)
+		//shardingFileDestination := generateFileName(utils.CurrentDate()+"_", filename)
+		shardingFileDestination := strings.Replace(fileDestination, filepath.Ext(fileDestination), filename, 1)
+		//shardingCarFileDestinationList = append(shardingCarFileDestinationList, shardingFileDestination)
+
+		// 生成分片文件
+		//ioutil.WriteFile(fmt.Sprintf("chunk-%d.car", shardingNo), bytes, 0644)
+		err = os.WriteFile(shardingFileDestination, bytes, 0644)
+		if err != nil {
+			//panic(err)
+
+			fmt.Printf("Error:%+v\n", err)
+			return err
+		}
+
+		// 计算分片文件sha256
+		shardingSha256, err := utils.GetFileSha256ByPath(shardingFileDestination)
+		if err != nil {
+			//panic(err)
+
+			fmt.Printf("Error:%+v\n", err)
+			return err
+		}
+		//carFileUploadReq.RawSha256 = shardingSha256
+
+		shardingNo++
+
+		// 设置分片请求对象
+		shardingCarFileUploadReq := model.CarFileUploadReq{}
+		deepcopier.Copy(&req).To(&shardingCarFileUploadReq)
+		shardingCarFileUploadReq.ShardingSha256 = shardingSha256
+		shardingCarFileUploadReq.ShardingNo = shardingNo
+		*shardingCarFileUploadReqs = append(*shardingCarFileUploadReqs, shardingCarFileUploadReq)
 	}
+
+	// 分片失败
+	shardingAmount := len(*shardingCarFileUploadReqs)
+	if shardingAmount == 0 {
+		// todo: add constant
+		fmt.Printf("Error:%+v\n", err)
+		//return err
+		return errors.New("生成CAR文件分片操作失败")
+	}
+
+	req.ShardingAmount = shardingAmount
 
 	return nil
 }
@@ -493,9 +554,9 @@ func UploadCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResponse, err
 	return response, nil
 }
 
-// 上传CAR文件
-func UploadShardingCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResponse, error) {
-	response := model.ObjectCreateResponse{}
+// 上传CAR文件分片
+func UploadShardingCarFile(req *model.CarFileUploadReq) (model.ShardingCarFileUploadResponse, error) {
+	response := model.ShardingCarFileUploadResponse{}
 
 	// 请求Url
 	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
@@ -546,5 +607,30 @@ func UploadShardingCarFile(req *model.CarFileUploadReq) (model.ObjectCreateRespo
 	}
 
 	fmt.Printf("response:%+v", response)
+	return response, nil
+}
+
+// 上传大CAR文件
+func UploadBigCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResponse, error) {
+	response := model.ObjectCreateResponse{}
+
+	// 生成CAR分片文件
+	shardingCarFileUploadReqs := []model.CarFileUploadReq{}
+	err := generateShardingCarFiles(req, &shardingCarFileUploadReqs)
+	if err != nil {
+		return response, err
+	}
+
+	// 上传CAR文件分片
+	uploadingReqs := []model.CarFileUploadReq{}
+	deepcopier.Copy(&shardingCarFileUploadReqs).To(&uploadingReqs)
+
+	//for {
+	//
+	//}
+	for i, _ := range shardingCarFileUploadReqs {
+		UploadShardingCarFile(&shardingCarFileUploadReqs[i])
+	}
+
 	return response, nil
 }
