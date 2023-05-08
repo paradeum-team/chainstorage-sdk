@@ -1,11 +1,8 @@
 package main
 
 import (
-	"chainstorage-sdk/internal/service"
-	"chainstorage-sdk/model"
-	"chainstorage-sdk/utils"
+	"chainstorage-sdk/chainstoragesdk"
 	"fmt"
-	ipldfmt "github.com/ipfs/go-ipld-format"
 )
 
 func main() {
@@ -23,17 +20,24 @@ func main() {
 
 	// region 桶数据
 
-	//// 获取桶数据列表
-	//bucketName := ""
-	//pageSize := 10
-	//pageIndex := 1
-	//response, err := service.GetBucketList(bucketName, pageSize, pageIndex)
-	//if err != nil {
-	//	fmt.Printf("error:%+v\n", err)
-	//	return
-	//}
-	//
-	//fmt.Printf("response:%+v\n", response)
+	sdk, err := chainstoragesdk.New()
+	if err != nil {
+		fmt.Printf("error:%+v\n", err)
+		return
+	}
+	fmt.Printf("sdk.myConfig:%+v\n", sdk.Config)
+
+	// 获取桶数据列表
+	bucketName := ""
+	pageSize := 10
+	pageIndex := 1
+	response, err := sdk.Bucket.GetBucketList(bucketName, pageSize, pageIndex)
+	if err != nil {
+		fmt.Printf("error:%+v\n", err)
+		return
+	}
+
+	fmt.Printf("response:%+v\n", response)
 
 	//// 创建桶数据
 	//bucketName := "bucket3"
@@ -191,38 +195,38 @@ func main() {
 	//
 	//fmt.Printf("response:%+v\n", response)
 
-	// 引用对象
-	dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
-	linkContent := ipldfmt.Link{}
-	err := service.TempParseCarDag(dataPath, &linkContent)
-	if err != nil {
-		fmt.Printf("error:%+v\n", err)
-		return
-	}
-
-	cid := linkContent.Cid
-	size := linkContent.Size
-	name := linkContent.Name
-
-	carFileUploadReq := model.CarFileUploadReq{}
-	carFileUploadReq.BucketId = 18
-	carFileUploadReq.ObjectCid = cid.String()
-	carFileUploadReq.ObjectSize = int64(size)
-	carFileUploadReq.ObjectName = name
-	carFileUploadReq.FileDestination = dataPath
-	sha256, err := utils.GetFileSha256ByPath(dataPath)
-	if err != nil {
-		fmt.Printf("error:%+v\n", err)
-		return
-	}
-	carFileUploadReq.RawSha256 = sha256
-
-	response, err := service.ReferenceObject(&carFileUploadReq)
-	if err != nil {
-		fmt.Printf("error:%+v\n", err)
-		return
-	}
-	fmt.Printf("response:%+v\n", response)
+	//// 引用对象
+	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	//linkContent := ipldfmt.Link{}
+	//err := service.TempParseCarDag(dataPath, &linkContent)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//cid := linkContent.Cid
+	//size := linkContent.Size
+	//name := linkContent.Name
+	//
+	//carFileUploadReq := model.CarFileUploadReq{}
+	//carFileUploadReq.BucketId = 18
+	//carFileUploadReq.ObjectCid = cid.String()
+	//carFileUploadReq.ObjectSize = int64(size)
+	//carFileUploadReq.ObjectName = name
+	//carFileUploadReq.FileDestination = dataPath
+	//sha256, err := utils.GetFileSha256ByPath(dataPath)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//carFileUploadReq.RawSha256 = sha256
+	//carService := service.Car{}
+	//response, err := carService.ReferenceObject(&carFileUploadReq)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//fmt.Printf("response:%+v\n", response)
 
 	//	// 普通上传
 	//	dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
@@ -278,7 +282,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := "api/v1/apiKeys"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -333,7 +337,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := "api/v1/buckets"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -382,7 +386,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := "api/v1/bucket"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -423,7 +427,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := "api/v1/bucket/status/clean"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -460,7 +464,7 @@ func main() {
 //	//todo: bucket id check?
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := fmt.Sprintf("api/v1/bucket/%d", bucketId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -519,7 +523,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := "api/v1/objects/search"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -563,7 +567,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := "api/v1/object"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -611,7 +615,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := fmt.Sprintf("api/v1/object/name/%d", objectId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -657,7 +661,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.Config.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
 //	apiPath := fmt.Sprintf("api/v1/object/mark/%d", objectId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //

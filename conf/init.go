@@ -19,9 +19,10 @@ import (
 )
 
 // test merge
-func init() {
+func init3() {
 	rand.Seed(time.Now().UnixNano())
 	config, err := gprofile.Profile(&ApplicationConfig{}, "./application.yaml", true)
+	//config, err := gprofile.Profile(&ApplicationConfig{}, "./chainstorage-sdk.yaml", true)
 	if err != nil {
 		fmt.Errorf("Profile execute error", err)
 	}

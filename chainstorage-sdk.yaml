@@ -1,0 +1,14 @@
+server:
+  #链存服务API地址
+  chainStorageApiBaseAddress: http://127.0.0.1:8821
+  #CAR文件工作目录
+  carFileGenerationPath: ./temp/carfile
+  #CAR文件分片阈值application.yaml
+  carFileShardingThreshold: 104857600
+
+logger:
+  mode: debug
+  level: info
+  isOutPutFile: false
+  maxAgeDay: 7
+  rotationTime: 1

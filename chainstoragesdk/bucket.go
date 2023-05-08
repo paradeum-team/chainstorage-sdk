@@ -1,4 +1,4 @@
-package service
+package chainstoragesdk
 
 import (
 	client "chainstorage-sdk/base/tokenclient"
@@ -18,8 +18,9 @@ import (
 )
 
 type Bucket struct {
-	//Client chainstoragesdk.Client
-	//Config chainstoragesdk.SdkConfig
+	//myClient chainstoragesdk.myClient
+	Config *Configuration
+	Client *RestyClient
 }
 
 // region 桶数据
@@ -49,8 +50,8 @@ func (b *Bucket) GetBucketList(bucketName string, pageSize, pageIndex int) (mode
 	// 请求Url
 	urlQuery = strings.TrimSuffix(urlQuery, "&")
 
-	apiBaseAddress := conf.Config.ChainStorageApiBaseAddress
-	//apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	//apiBaseAddress := conf.myConfig.ChainStorageApiBaseAddress
+	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/buckets"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -59,7 +60,8 @@ func (b *Bucket) GetBucketList(bucketName string, pageSize, pageIndex int) (mode
 	}
 
 	// API调用
-	httpStatus, body, err := client.RestyGet(apiUrl)
+	httpStatus, body, err := b.Client.RestyGet(apiUrl)
+	//httpStatus, body, err := client.RestyGet(apiUrl)
 	if err != nil {
 		utils.LogError(fmt.Sprintf("API:GetBucketList:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
 

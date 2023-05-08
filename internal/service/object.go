@@ -16,10 +16,13 @@ import (
 	"strings"
 )
 
+type Object struct {
+}
+
 // region 对象数据
 
 // 获取对象数据列表
-func GetObjectList(bucketId int, objectItem string, pageSize, pageIndex int) (model.ObjectPageResponse, error) {
+func (o *Object) GetObjectList(bucketId int, objectItem string, pageSize, pageIndex int) (model.ObjectPageResponse, error) {
 	response := model.ObjectPageResponse{}
 
 	// 参数设置
@@ -77,7 +80,7 @@ func GetObjectList(bucketId int, objectItem string, pageSize, pageIndex int) (mo
 }
 
 // 删除对象数据
-func RemoveObject(objectIds []int) (model.ObjectRemoveResponse, error) {
+func (o *Object) RemoveObject(objectIds []int) (model.ObjectRemoveResponse, error) {
 	response := model.ObjectRemoveResponse{}
 
 	// 参数设置
@@ -120,7 +123,7 @@ func RemoveObject(objectIds []int) (model.ObjectRemoveResponse, error) {
 }
 
 // 重命名对象数据
-func RenameObject(objectId int, objectName string, isOverwrite bool) (model.ObjectRenameResponse, error) {
+func (o *Object) RenameObject(objectId int, objectName string, isOverwrite bool) (model.ObjectRenameResponse, error) {
 	response := model.ObjectRenameResponse{}
 
 	// 参数设置
@@ -173,7 +176,7 @@ func RenameObject(objectId int, objectName string, isOverwrite bool) (model.Obje
 }
 
 // 设置对象数据星标
-func MarkObject(objectId int, isMarked bool) (model.ObjectMarkResponse, error) {
+func (o *Object) MarkObject(objectId int, isMarked bool) (model.ObjectMarkResponse, error) {
 	response := model.ObjectMarkResponse{}
 
 	// 参数设置
@@ -244,7 +247,7 @@ func checkObjectName(objectName string) error {
 }
 
 // 根据CID检查是否已经存在Object
-func IsExistObjectByCid(objectCid string) (model.ObjectExistResponse, error) {
+func (o *Object) IsExistObjectByCid(objectCid string) (model.ObjectExistResponse, error) {
 	response := model.ObjectExistResponse{}
 
 	// 参数设置
