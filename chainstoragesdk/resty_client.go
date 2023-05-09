@@ -22,12 +22,24 @@ var (
 
 type RestyClient struct {
 	Config *Configuration
+	//logger *golog.Logger
+}
+
+func (r *RestyClient) getHeaders() *map[string]string {
+	apiToken := r.Config.ChainStorageApiToken
+	httpRequestUserAgent := r.Config.HttpRequestUserAgent
+
+	return &map[string]string{
+		"Accept":        "application/json",
+		"Authorization": apiToken,
+		"User-Agent":    httpRequestUserAgent,
+	}
 }
 
 func (r *RestyClient) RestyGet(url string) (httpStatus int, body []byte, err error) {
 	resp, err := resty.
 		SetTimeout(time.Duration(60) * time.Second).
-		SetHeaders(headers).
+		SetHeaders(*r.getHeaders()).
 		R().Get(url)
 	if err != nil {
 		if perr, ok := err.(net.Error); ok && perr.Timeout() {
@@ -45,7 +57,7 @@ func (r *RestyClient) RestyGet(url string) (httpStatus int, body []byte, err err
 func (r *RestyClient) RestyPut(url string, data interface{}) (httpStatus int, body []byte, err error) {
 	resp, err := resty.
 		SetTimeout(time.Duration(60) * time.Second).
-		SetHeaders(headers).
+		SetHeaders(*r.getHeaders()).
 		R().SetBody(data).Put(url)
 	if err != nil {
 		if perr, ok := err.(net.Error); ok && perr.Timeout() {
@@ -63,7 +75,7 @@ func (r *RestyClient) RestyPut(url string, data interface{}) (httpStatus int, bo
 func (r *RestyClient) RestyPost(url string, data interface{}) (httpStatus int, body []byte, err error) {
 	resp, err := resty.
 		SetTimeout(time.Duration(60) * time.Second).
-		SetHeaders(headers).
+		SetHeaders(*r.getHeaders()).
 		R().SetBody(data).Post(url)
 	if err != nil {
 		if perr, ok := err.(net.Error); ok && perr.Timeout() {
@@ -86,7 +98,7 @@ func (r *RestyClient) RestyPostForm(filename string, filePath string, formData m
 
 	resp, err := resty.
 		SetTimeout(time.Duration(60)*time.Second).
-		SetHeaders(headers).
+		SetHeaders(*r.getHeaders()).
 		R().SetFileReader("file", filename, bytes.NewReader(fileb)).
 		SetFormData(formData).
 		Post(url)
@@ -108,7 +120,7 @@ func (r *RestyClient) RestyPostForm(filename string, filePath string, formData m
 func (r *RestyClient) RestyDelete(url string, data interface{}) (httpStatus int, body []byte, err error) {
 	resp, err := resty.
 		SetTimeout(time.Duration(60) * time.Second).
-		SetHeaders(headers).
+		SetHeaders(*r.getHeaders()).
 		R().
 		SetBody(data).
 		Delete(url)
