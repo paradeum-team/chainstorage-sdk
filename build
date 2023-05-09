@@ -1,0 +1,11 @@
+
+CGO_ENABLED=0 GOARCH=amd64  GOOS=linux go build -a -v -installsuffix cgo -o bin/chainstorage-sdk.
+
+#CGO_ENABLED=0 GOARCH=386  GOOS=windows go build -a -v -installsuffix cgo -o bin/chainstorage-sdk.
+
+#CGO_ENABLED=0 GOARCH=arm  GOOS=linux go build -a -v -installsuffix cgo -o bin/chainstorage-sdk.
+
+#docker build --no-cache -t registry.paradeum.com//chainstorage-sdk:v0.1 .
+
+#GOOS:Target Platform's os must  in [darwin freebsd linux windows]
+#GOARCH: Target Platform architecture must  in [386 amd64 arm]
