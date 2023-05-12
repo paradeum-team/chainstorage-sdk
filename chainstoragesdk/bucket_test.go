@@ -1,7 +1,7 @@
 package chainstoragesdk
 
 import (
-	"chainstorage-sdk/model"
+	"chainstorage-sdk/chainstoragesdk/model"
 	"reflect"
 	"testing"
 )

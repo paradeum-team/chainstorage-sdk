@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-var (
-	//token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlLZXkiOiJaT0dKNVI0QTZPU1JIWUlOTUlMQSIsImV4cCI6MTY4NDgzNDUxNSwiaWRlbnRpdHkiOnsiSWQiOjYsIk5pY2tOYW1lIjoidXNlcjEiLCJQcm9maWxlSW1hZ2UiOiIiLCJXYWxsZXRBZGRyIjoidXNlcjEiLCJ0ZXJtaW5hbCI6InBjL3NkayJ9LCJvcmlnX2lhdCI6MTY4MjI0MjUyNH0.w0lQ-RGufy5j3yMfbnL94hOvLeeCSccZbSIwd6kXvbI"
-	token     = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlLZXkiOiJaT0dKNVI0QTZPU1JIWUlOTUlMQSIsImV4cCI6MTY4NDgzNDUxNSwiaWRlbnRpdHkiOnsiSWQiOjYsIk5pY2tOYW1lIjoidXNlcjEiLCJQcm9maWxlSW1hZ2UiOiIiLCJXYWxsZXRBZGRyIjoidXNlcjEiLCJ0ZXJtaW5hbCI6InBjL3NkayJ9LCJvcmlnX2lhdCI6MTY4MjI0MjUyNH0.w0lQ-RGufy5j3yMfbnL94hOvLeeCSccZbSIwd6kXvbI"
-	userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-	headers   = map[string]string{
-		"Accept":        "application/json",
-		"Authorization": token,
-		"User-Agent":    userAgent,
-	}
-)
+//var (
+//	//token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlLZXkiOiJaT0dKNVI0QTZPU1JIWUlOTUlMQSIsImV4cCI6MTY4NDgzNDUxNSwiaWRlbnRpdHkiOnsiSWQiOjYsIk5pY2tOYW1lIjoidXNlcjEiLCJQcm9maWxlSW1hZ2UiOiIiLCJXYWxsZXRBZGRyIjoidXNlcjEiLCJ0ZXJtaW5hbCI6InBjL3NkayJ9LCJvcmlnX2lhdCI6MTY4MjI0MjUyNH0.w0lQ-RGufy5j3yMfbnL94hOvLeeCSccZbSIwd6kXvbI"
+//	token     = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlLZXkiOiJaT0dKNVI0QTZPU1JIWUlOTUlMQSIsImV4cCI6MTY4NDgzNDUxNSwiaWRlbnRpdHkiOnsiSWQiOjYsIk5pY2tOYW1lIjoidXNlcjEiLCJQcm9maWxlSW1hZ2UiOiIiLCJXYWxsZXRBZGRyIjoidXNlcjEiLCJ0ZXJtaW5hbCI6InBjL3NkayJ9LCJvcmlnX2lhdCI6MTY4MjI0MjUyNH0.w0lQ-RGufy5j3yMfbnL94hOvLeeCSccZbSIwd6kXvbI"
+//	userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+//	headers   = map[string]string{
+//		"Accept":        "application/json",
+//		"Authorization": token,
+//		"User-Agent":    userAgent,
+//	}
+//)
 
 type RestyClient struct {
 	Config *Configuration

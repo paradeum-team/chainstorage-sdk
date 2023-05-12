@@ -24,9 +24,9 @@ func newClient() (*myClient, error) {
 		initConfig()
 
 		mClient = &myClient{}
-		mClient.Config = &myConfig
+		mClient.Config = &cssConfig
 
-		mClient.Logger = GetLogger(&myLogger)
+		mClient.Logger = GetLogger(&cssLoggerConfig)
 
 		mClient.httpClient = &RestyClient{Config: mClient.Config}
 		mClient.Bucket = &Bucket{Config: mClient.Config, Client: mClient.httpClient, logger: mClient.Logger.logger}

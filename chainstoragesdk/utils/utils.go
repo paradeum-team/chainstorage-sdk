@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"chainstorage-sdk/chainstoragesdk/consts"
+	"chainstoragesdk/consts"
 	"fmt"
 	"io"
 	"log"

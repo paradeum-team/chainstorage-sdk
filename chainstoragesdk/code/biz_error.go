@@ -1,7 +1,7 @@
 package code
 
 import (
-	"chainstorage-sdk/chainstoragesdk/utils"
+	"chainstoragesdk/utils"
 	"fmt"
 	"strings"
 )

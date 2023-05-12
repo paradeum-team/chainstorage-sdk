@@ -1,8 +1,8 @@
 package chainstoragesdk
 
 import (
-	"chainstorage-sdk/chainstoragesdk/code"
-	"chainstorage-sdk/chainstoragesdk/model"
+	"chainstoragesdk/code"
+	"chainstoragesdk/model"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -265,6 +265,53 @@ func (o *Object) IsExistObjectByCid(objectCid string) (model.ObjectExistResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		o.logger.Errorf(fmt.Sprintf("API:IsExistObjectByCid:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
+// 根据CID检查是否已经存在Object
+func (o *Object) GetObjectByName(bucketId int, objectName string) (model.ObjectCreateResponse, error) {
+	response := model.ObjectCreateResponse{}
+
+	// 参数设置
+	urlQuery := "?"
+	if bucketId <= 0 {
+		return response, errors.New("请输入正确的桶ID")
+	}
+	urlQuery += fmt.Sprintf("bucketId=%d&", bucketId)
+
+	// 参数设置
+	if len(objectName) <= 0 {
+		return response, errors.New("请输入正确的对象名称.")
+	}
+	urlQuery += fmt.Sprintf("objectName=%s", url.QueryEscape(objectName))
+
+	// 请求Url
+	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiPath := fmt.Sprintf("api/v1/object/find/name%s", urlQuery)
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := o.Client.RestyGet(apiUrl)
+	if err != nil {
+		o.logger.Errorf(fmt.Sprintf("API:GetObjectByName:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		o.logger.Errorf(fmt.Sprintf("API:GetObjectByName:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		o.logger.Errorf(fmt.Sprintf("API:GetObjectByName:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
 
 		return response, err
 	}

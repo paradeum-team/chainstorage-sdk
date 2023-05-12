@@ -1,7 +1,7 @@
 package chainstoragesdk
 
 import (
-	"chainstorage-sdk/chainstoragesdk/utils"
+	"chainstoragesdk/utils"
 	"fmt"
 	"github.com/kataras/golog"
 	"github.com/lestrrat-go/file-rotatelogs"

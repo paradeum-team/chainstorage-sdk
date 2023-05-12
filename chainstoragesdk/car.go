@@ -2,8 +2,8 @@ package chainstoragesdk
 
 import (
 	"bytes"
-	"chainstorage-sdk/chainstoragesdk/model"
-	"chainstorage-sdk/chainstoragesdk/utils"
+	"chainstoragesdk/model"
+	"chainstoragesdk/utils"
 	"context"
 	"crypto/rand"
 	"encoding/hex"

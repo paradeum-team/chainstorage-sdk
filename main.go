@@ -1,7 +1,7 @@
 package main
 
 import (
-	"chainstorage-sdk/chainstoragesdk"
+	"chainstoragesdk"
 	"fmt"
 )
 
@@ -27,17 +27,17 @@ func main() {
 	}
 	fmt.Printf("sdk.myConfig:%+v\n", sdk.Config)
 
-	// 获取桶数据列表
-	bucketName := ""
-	pageSize := 10
-	pageIndex := 1
-	response, err := sdk.Bucket.GetBucketList(bucketName, pageSize, pageIndex)
-	if err != nil {
-		fmt.Printf("error:%+v\n", err)
-		return
-	}
-
-	fmt.Printf("response:%+v\n", response)
+	//// 获取桶数据列表
+	//bucketName := ""
+	//pageSize := 10
+	//pageIndex := 1
+	//response, err := sdk.Bucket.GetBucketList(bucketName, pageSize, pageIndex)
+	//if err != nil {
+	//	fmt.Printf("error:%+v\n", err)
+	//	return
+	//}
+	//
+	//fmt.Printf("response:%+v\n", response)
 
 	//// 创建桶数据
 	//bucketName := "bucket3"
@@ -73,7 +73,17 @@ func main() {
 
 	// endregion 桶数据
 
-	//// region 对象数据
+	// region 对象数据
+	bucketId := 18
+	objectName := "1e00000000000080599b55478cd59e9bf0f2f15619d353c9a37520397edd3380977b32d28ec4593ce30e8508a0adef06316d2d812f4417c494c359bf9c365f84.txt"
+	response, err := sdk.Object.GetObjectByName(bucketId, objectName)
+	if err != nil {
+		fmt.Printf("error:%+v\n", err)
+		return
+	}
+
+	fmt.Printf("response:%+v\n", response)
+
 	//
 	////// 获取对象数据列表
 	////bucketId := 16
@@ -135,43 +145,43 @@ func main() {
 	//
 	//fmt.Printf("response:%+v\n", response)
 
-	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
-	//////dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
+	//dataPath := "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	//////dataPath := "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
 	//err := service.GetCarDag(dataPath, "")
 	//if err != nil {
 	//	fmt.Printf("error:%+v\n", err)
 	//	return
 	//}
 	//
-	//dataPath = "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
+	//dataPath = "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
 	//err = service.GetCarDag(dataPath, "")
 	//if err != nil {
 	//	fmt.Printf("error:%+v\n", err)
 	//	return
 	//}
 
-	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_chunk-0.car"
+	//dataPath := "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230504_chunk-0.car"
 	//err := service.GetCarDag(dataPath, "")
 	//if err != nil {
 	//	fmt.Printf("error:%+v\n", err)
 	//	return
 	//}
 
-	//dataPath = "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_chunk-1.car"
+	//dataPath = "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230504_chunk-1.car"
 	//err = service.GetCarDag(dataPath, "")
 	//if err != nil {
 	//	fmt.Printf("error:%+v\n", err)
 	//	return
 	//}
 	//
-	//dataPath = "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_chunk-2.car"
+	//dataPath = "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230504_chunk-2.car"
 	//err = service.GetCarDag(dataPath, "")
 	//if err != nil {
 	//	fmt.Printf("error:%+v\n", err)
 	//	return
 	//}
 
-	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
+	//dataPath := "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230504_d1dff2561e13ca40d8a2f7c8c832d01d.tmp"
 	//err := service.SliceBigCarFile(dataPath)
 	//if err != nil {
 	//	fmt.Printf("error:%+v\n", err)
@@ -196,7 +206,7 @@ func main() {
 	//fmt.Printf("response:%+v\n", response)
 
 	//// 引用对象
-	//dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	//dataPath := "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
 	//linkContent := ipldfmt.Link{}
 	//err := service.TempParseCarDag(dataPath, &linkContent)
 	//if err != nil {
@@ -229,7 +239,7 @@ func main() {
 	//fmt.Printf("response:%+v\n", response)
 
 	//	// 普通上传
-	//	dataPath := "/Users/yuan/code/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
+	//	dataPath := "/Users/yuan/code/github.com/paradeum-team/chainstorage-sdk/temp/carfile/20230427_dd61af72e8fbcecc44d246465496478e.tmp"
 	//	linkContent := ipldfmt.Link{}
 	//	err := service.TempParseCarDag(dataPath, &linkContent)
 	//	if err != nil {
