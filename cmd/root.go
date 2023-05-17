@@ -65,6 +65,7 @@ func Execute() {
 		objectListCmd,
 		objectRenameCmd,
 		objectRemoveCmd,
+		objectDownloadCmd,
 	)
 
 	if err := rootCmd.Execute(); err != nil {

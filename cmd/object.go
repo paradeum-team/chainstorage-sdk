@@ -4,6 +4,9 @@ import (
 	"chainstoragesdk"
 	sdkcode "chainstoragesdk/code"
 	"chainstoragesdk/model"
+	"context"
+	"fmt"
+	"github.com/Code-Hex/pget"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/ulule/deepcopier"
@@ -29,6 +32,11 @@ func init() {
 	objectRemoveCmd.Flags().StringP("Object", "o", "", "对象名称")
 	objectRemoveCmd.Flags().StringP("Cid", "c", "", "Cid")
 	objectRemoveCmd.Flags().BoolP("Force", "f", false, "有冲突的时候强制覆盖")
+
+	objectDownloadCmd.Flags().StringP("Bucket", "b", "", "桶名称")
+	objectDownloadCmd.Flags().StringP("Object", "o", "", "对象名称")
+	objectDownloadCmd.Flags().StringP("Cid", "c", "", "Cid")
+	objectDownloadCmd.Flags().BoolP("Target", "t", false, "输出路径")
 }
 
 // region Object List
@@ -682,3 +690,188 @@ type ObjectRemoveOutput struct {
 }
 
 // endregion Object Remove
+
+// region Object Download
+
+var objectDownloadCmd = &cobra.Command{
+	Use:     "get",
+	Short:   "get",
+	Long:    "download object",
+	Example: "gcscmd get cs://BUCKET [--name=<name>] [--cid=<cid>]",
+
+	Run: func(cmd *cobra.Command, args []string) {
+		objectDownloadRun(cmd, args)
+	},
+}
+
+func objectDownloadRun(cmd *cobra.Command, args []string) {
+
+	// 桶名称
+	bucketName, err := cmd.Flags().GetString("Bucket")
+	if err != nil {
+		//todo: log detail error?
+		//panic(err)
+		//fmt.Printf("error:%+v\n", err)
+		processError("ls", err, args)
+	}
+
+	// 对象名称
+	objectName, err := cmd.Flags().GetString("Object")
+	if err != nil {
+		//todo: log detail error?
+		//panic(err)
+		//fmt.Printf("error:%+v\n", err)
+		processError("ls", err, args)
+	}
+
+	//// 对象CID
+	//cid, err := cmd.Flags().GetString("Cid")
+	//if err != nil {
+	//	//todo: log detail error?
+	//	//panic(err)
+	//	//fmt.Printf("error:%+v\n", err)
+	//	processError("ls", err, args)
+	//}
+
+	//// 输出路径
+	//target, err := cmd.Flags().GetBool("Target")
+	//if err != nil {
+	//	//todo: log detail error?
+	//	//panic(err)
+	//	//fmt.Printf("error:%+v\n", err)
+	//	processError("get", err, args)
+	//
+	//}
+
+	sdk, err := chainstoragesdk.New()
+	if err != nil {
+		//todo: log detail error?
+		//fmt.Printf("error:%+v\n", err)
+		processError("get", err, args)
+	}
+
+	// 确认桶数据有效性
+	respBucket, err := sdk.Bucket.GetBucketByName(bucketName)
+	if err != nil {
+		//todo: log detail error?
+		//fmt.Printf("error:%+v\n", err)
+		processError("rm", err, args)
+	}
+
+	// 桶ID
+	bucketId := respBucket.Data.Id
+
+	// 确认对象数据有效性
+	response, err := sdk.Object.GetObjectByName(bucketId, objectName)
+	if err != nil {
+		//todo: log detail error?
+		//fmt.Printf("error:%+v\n", err)
+		processError("get", err, args)
+	}
+
+	// 对象ID
+	//objectId := response.Data.Id
+	//objectName := response.Data.ObjectName
+	objectCid := response.Data.ObjectCid
+	downloadEndpoint := "https://test-ipfs-gateway.netwarps.com/ipfs/"
+	downloadUrl := fmt.Sprintf("%s%s", downloadEndpoint, objectCid)
+
+	// todo:
+	downloadUrl = "https://test-ipfs-gateway.netwarps.com/ipfs/bafybeiguyrqm6z76mrhntk64fiwwdpjqv64ny3ugw64owznlbeotknvypa"
+	cli := pget.New()
+	cli.URLs = []string{downloadUrl}
+	cli.Output = objectName
+
+	version := "CMD"
+
+	if err := cli.Run(context.Background(), version, []string{"-t", "30"}); err != nil {
+		if cli.Trace {
+			fmt.Fprintf(os.Stderr, "Error:\n%+v\n", err)
+		} else {
+			fmt.Fprintf(os.Stderr, "Error:\n  %v\n", err)
+		}
+		processError("get", err, args)
+	}
+
+	objectDownloadRunOutput(cmd, args, response)
+}
+
+func objectDownloadRunOutput(cmd *cobra.Command, args []string, resp model.ObjectCreateResponse) {
+	respCode := int(resp.Code)
+
+	if respCode != http.StatusOK {
+		err := errors.Errorf("code:%d, message:&s\n", resp.Code, resp.Msg)
+		processError("get", err, args)
+	}
+
+	objectDownloadOutput := ObjectDownloadOutput{
+		RequestId: resp.RequestId,
+		Code:      resp.Code,
+		Msg:       resp.Msg,
+		Status:    resp.Status,
+	}
+
+	//	下载对象
+	//	通过命令下载固定桶内的对象数据
+	//
+	//	模版
+	//
+	//	gcscmd get cs://BUCKET [--name=<name>] [--cid=<cid>]
+	//	BUCKET
+	//
+	//	桶名称
+	//
+	//	carfile
+	//
+	//	car文件标识
+	//
+	//	命令行例子
+	//
+	//	桶内对应 cid
+	//
+	//	gcscmd get cs://bbb --cid QmWgnG7pPjG31w328hZyALQ2BgW5aQrZyKpT47jVpn8CNo
+	//	桶内对象名
+	//
+	//	gcscmd get cs://bbb  --name Tarkov.mp4
+	//	响应
+	//
+	//	过程
+	//
+	//	################                                                                15%
+	//		QmWgnG7pPjG31w328hZyALQ2BgW5aQrZyKpT47jVpn8CNo        Tarkov.mp4
+	//	完成
+	//
+	//CID:    QmWgnG7pPjG31w328hZyALQ2BgW5aQrZyKpT47jVpn8CNo
+	//Name:Tarkov.mp4
+
+	templateContent := `
+CID: {{.ObjectCid}}
+Name: {{.ObjectName}}
+`
+
+	t, err := template.New("objectDownloadTemplate").Parse(templateContent)
+	if err != nil {
+		//todo: log detail error?
+		//fmt.Printf("err:%+v", resp)
+		//panic(err)
+		processError("get", err, args)
+	}
+
+	err = t.Execute(os.Stdout, objectDownloadOutput)
+	if err != nil {
+		//todo: log detail error?
+		//fmt.Printf("err:%+v", resp)
+		//panic(err)
+		processError("get", err, args)
+	}
+}
+
+type ObjectDownloadOutput struct {
+	RequestId string       `json:"requestId,omitempty"`
+	Code      int32        `json:"code,omitempty"`
+	Msg       string       `json:"msg,omitempty"`
+	Status    string       `json:"status,omitempty"`
+	Data      ObjectOutput `json:"objectOutput,omitempty"`
+}
+
+// endregion Object Download

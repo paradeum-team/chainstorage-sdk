@@ -2,6 +2,8 @@ package chainstoragesdk
 
 import (
 	"bytes"
+	"chainstoragesdk/code"
+	"chainstoragesdk/consts"
 	"chainstoragesdk/model"
 	"chainstoragesdk/utils"
 	"context"
@@ -538,7 +540,7 @@ func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
 // endregion CAR file
 
 // TempFileName generates a temporary filename for use in testing or whatever
-func (c *Car) generateTempFileName(prefix, suffix string) string {
+func (c *Car) GenerateTempFileName(prefix, suffix string) string {
 	randBytes := make([]byte, 16)
 	rand.Read(randBytes)
 
@@ -561,7 +563,7 @@ func (c *Car) generateFileName(prefix, suffix string) string {
 	return filepath.Join(carFileGenerationPath, prefix+suffix)
 }
 
-func TempParseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
+func (c *Car) ParseCarFile(carFilePath string, linkContent *ipldfmt.Link) error {
 	return parseCarDag(carFilePath, linkContent)
 }
 
@@ -597,7 +599,7 @@ func (c *Car) SliceBigCarFile(carFilePath string) error {
 }
 
 // 生成CAR分片文件
-func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarFileUploadReqs *[]model.CarFileUploadReq) error {
+func (c *Car) GenerateShardingCarFiles(req *model.CarFileUploadReq, shardingCarFileUploadReqs *[]model.CarFileUploadReq) error {
 	fileDestination := req.FileDestination
 
 	bigCarFile, err := os.Open(fileDestination)
@@ -676,7 +678,7 @@ func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 		// todo: add constant
 		fmt.Printf("Error:%+v\n", err)
 		//return err
-		return errors.New("生成CAR文件分片操作失败")
+		return code.ErrCarUploadFileChunkCarFileFail
 	}
 
 	req.ShardingAmount = shardingAmount
@@ -692,21 +694,21 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 
 	// 数据路径为空
 	if len(dataPath) == 0 {
-		return response, errors.New("数据路径为空")
+		return response, code.ErrCarUploadFileInvalidDataPath
 	}
 
 	// 数据路径无效
 	fileInfo, err := os.Stat(dataPath)
 	if os.IsNotExist(err) {
-		return response, errors.New("数据路径无效")
+		return response, code.ErrCarUploadFileInvalidDataPath
 	} else if err != nil {
 		return response, err
 	}
 
 	// add constant
 	carVersion := 1
-	fileDestination := c.generateTempFileName(utils.CurrentDate()+"_", ".tmp")
-	//fileDestination := generateTempFileName("", ".tmp")
+	fileDestination := c.GenerateTempFileName(utils.CurrentDate()+"_", ".tmp")
+	//fileDestination := GenerateTempFileName("", ".tmp")
 	fmt.Printf("UploadData carVersion:%d, fileDestination:%s, dataPath:%s\n", carVersion, fileDestination, dataPath)
 
 	// 创建Car文件
@@ -714,7 +716,7 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	err = createCar(ctx, carVersion, fileDestination, dataPath)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("创建Car文件失败")
+		return response, code.ErrCarUploadFileCreateCarFileFail
 	}
 	// todo: 清除CAR文件，添加utils
 	//defer func(objectSize string) {
@@ -730,7 +732,7 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	err = parseCarDag(fileDestination, &linkContent)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("解析CAR文件失败")
+		return response, code.ErrCarUploadFileParseCarFileFail
 	}
 
 	objectCid := linkContent.Cid.String()
@@ -751,14 +753,14 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 		// const (
 		//	ObjectTypeCodeDir   = 20000
 		// )
-		carFileUploadReq.ObjectTypeCode = 20000
+		carFileUploadReq.ObjectTypeCode = consts.ObjectTypeCodeDir
 	}
 
 	// 计算文件sha256
 	sha256, err := utils.GetFileSha256ByPath(dataPath)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("hash计算失败")
+		return response, code.ErrCarUploadFileComputeCarFileHashFail
 	}
 	carFileUploadReq.RawSha256 = sha256
 
@@ -767,17 +769,16 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	objectExistResponse, err := objectService.IsExistObjectByCid(objectCid)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("CID秒传检查失败")
+		return response, code.ErrCarUploadFileReferenceObjcetFail
 	}
 
 	// CID存在，执行秒传操作
 	objectExistCheck := objectExistResponse.Data
 	if objectExistCheck.IsExist {
-		carService := Car{}
-		response, err := carService.ReferenceObject(&carFileUploadReq)
+		response, err := c.ReferenceObject(&carFileUploadReq)
 		if err != nil {
 			fmt.Printf("Error:%+v\n", err)
-			//return response, errors.New("执行秒传操作失败")
+			return response, code.ErrCarUploadFileReferenceObjcetFail
 		}
 
 		return response, err
@@ -790,14 +791,18 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	// 生成CAR分片文件上传
 	if carFileSize > int64(carFileShardingThreshold) {
 		//todo:分片上传
+		response, err = c.UploadBigCarFile(&carFileUploadReq)
+		if err != nil {
+			fmt.Printf("Error:%+v\n", err)
+			return response, code.ErrCarUploadFileFail
+		}
 	}
 
 	// 普通上传
-	carService := Car{}
-	response, err = carService.UploadCarFile(&carFileUploadReq)
+	response, err = c.UploadCarFile(&carFileUploadReq)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		//return response, errors.New("普通上传操作失败")
+		return response, code.ErrCarUploadFileFail
 	}
 
 	return response, err
@@ -809,7 +814,7 @@ func (c *Car) UploadBigCarFile(req *model.CarFileUploadReq) (model.ObjectCreateR
 
 	// 生成CAR分片文件
 	shardingCarFileUploadReqs := []model.CarFileUploadReq{}
-	err := c.generateShardingCarFiles(req, &shardingCarFileUploadReqs)
+	err := c.GenerateShardingCarFiles(req, &shardingCarFileUploadReqs)
 	if err != nil {
 		return response, err
 	}
@@ -822,8 +827,7 @@ func (c *Car) UploadBigCarFile(req *model.CarFileUploadReq) (model.ObjectCreateR
 	//
 	//}
 	for i, _ := range shardingCarFileUploadReqs {
-		carService := Car{}
-		carService.UploadShardingCarFile(&shardingCarFileUploadReqs[i])
+		c.UploadShardingCarFile(&shardingCarFileUploadReqs[i])
 	}
 
 	return response, nil

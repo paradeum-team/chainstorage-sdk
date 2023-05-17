@@ -143,7 +143,7 @@ func (b *Bucket) EmptyBucket(bucketId int) (model.BucketEmptyResponse, error) {
 
 	// 参数设置
 	if bucketId <= 0 {
-		return response, errors.New("请输入正确的桶ID.")
+		return response, code.ErrInvalidBucketId
 	}
 
 	params := map[string]interface{}{
@@ -186,7 +186,7 @@ func (b *Bucket) RemoveBucket(bucketId int, autoEmptyBucketData bool) (model.Buc
 
 	// 参数设置
 	if bucketId <= 0 {
-		return response, errors.New("请输入正确的桶ID.")
+		return response, code.ErrInvalidBucketId
 	}
 
 	// 自动清空数据

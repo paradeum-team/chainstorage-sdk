@@ -33,6 +33,7 @@ const (
 	errBucketQuotaFetchFail
 	errUserQuotaUpdateFail
 	errOnlyCreate1BucketForSameStorageNetwork
+	errInvalidBucketId
 )
 
 // 文件列表
@@ -43,6 +44,8 @@ const (
 	errObjectNameConflict
 	errObjectSetReferenceCounterFail
 	errInvalidObjectCid
+	errInvalidObjectId
+	errInvalidObjectIds
 )
 
 // ApiKey
@@ -59,7 +62,13 @@ const (
 
 // CAR文件上传
 const (
-	errCarUploadFileParseFail int = iota + 100901
+	errCarUploadFileFail int = iota + 100901
+	errCarUploadFileInvalidDataPath
+	errCarUploadFileCreateCarFileFail
+	errCarUploadFileParseCarFileFail
+	errCarUploadFileComputeCarFileHashFail
+	errCarUploadFileChunkCarFileFail
+	errCarUploadFileReferenceObjcetFail
 )
 
 var (
@@ -94,6 +103,7 @@ var (
 	ErrBucketQuotaFetchFail                   = NewBizError(errBucketQuotaFetchFail, "桶容量配额获取出错，请重试", "Error occurred while getting bucket capacity quota, please try again")
 	ErrUserQuotaUpdateFail                    = NewBizError(errUserQuotaUpdateFail, "桶容量配额获取出错，请重试", "Error occurred while getting bucket capacity quota, please try again")
 	ErrOnlyCreate1BucketForSameStorageNetwork = NewBizError(errOnlyCreate1BucketForSameStorageNetwork, "基础版本限制，每种网络类型只能创建一个桶", "In the basic version, only one bucket can be created for each network type")
+	ErrInvalidBucketId                        = NewBizError(errInvalidBucketId, "桶ID无效", "invalid bucket ID")
 
 	// 文件列表
 	ErrObjectNotFound                = NewBizError(errObjectNotFound, "该对象数据不存在", "The object data does not exist")
@@ -101,6 +111,8 @@ var (
 	ErrObjectNameConflictInBucket    = NewBizError(errObjectNameConflict, "对象名称已存在，是否覆盖原有对象", "Object name already exists, do you want to overwrite the existing object?")
 	ErrObjectSetReferenceCounterFail = NewBizError(errObjectSetReferenceCounterFail, "对象引用计数器操作出错", "Error occurred while operating object reference counter")
 	ErrInvalidObjectCid              = NewBizError(errInvalidObjectCid, "无效的对象CID", "Invalid object CID")
+	ErrInvalidObjectId               = NewBizError(errInvalidObjectId, "无效的对象ID", "invalid object ID")
+	ErrInvalidObjectIds              = NewBizError(errInvalidObjectIds, "无效的对象ID列表", "invalid object ID list")
 
 	// ApiKey
 	ErrApiKeyNotFound                        = NewBizError(errApiKeyNotFound, "该 APIKey 不存在", "The APIKey does not exist")
@@ -113,7 +125,13 @@ var (
 	ErrApiKeyPinningServicePermissionMustSet = NewBizError(errApiKeyPinningServicePermissionMustSet, "PinningServiceAPI 权限设置不正确，请重试", "Incorrect PinningServiceAPI permissions setting，please try again")
 
 	// CAR文件上传
-	ErrCarUploadFileParseFail = NewBizError(errCarUploadFileParseFail, "CAR上传文件解析失败", "Fail to parse the uploading CAR file")
+	ErrCarUploadFileFail                   = NewBizError(errCarUploadFileFail, "CAR上传文件失败", "Fail to upload CAR file")
+	ErrCarUploadFileInvalidDataPath        = NewBizError(errCarUploadFileInvalidDataPath, "无效的上传数据路径", "Invalid uploading data path")
+	ErrCarUploadFileCreateCarFileFail      = NewBizError(errCarUploadFileCreateCarFileFail, "创建CAR文件失败", "Fail to create CAR file")
+	ErrCarUploadFileParseCarFileFail       = NewBizError(errCarUploadFileParseCarFileFail, "解析CAR文件失败", "Fail to parse CAR file")
+	ErrCarUploadFileComputeCarFileHashFail = NewBizError(errCarUploadFileComputeCarFileHashFail, "CAR文件HASH计算失败", "Fail to compute CAR file HASH")
+	ErrCarUploadFileChunkCarFileFail       = NewBizError(errCarUploadFileChunkCarFileFail, "生成CAR文件分片操作失败", "Fail to chunk CAR file")
+	ErrCarUploadFileReferenceObjcetFail    = NewBizError(errCarUploadFileReferenceObjcetFail, "执行CID秒传操作失败", "Fail to reference object by CID")
 
 	////登录注册
 	//ErrWalletInvalidFailed               = NewBizError(errLogin, "钱包地址非法空", "Invalid wallet")
@@ -165,7 +183,7 @@ var (
 	//ErrApiKeyPinningServicePermissionMustSet = NewBizError(errApiKeyPinningServicePermissionMustSet, "PinningServiceAPI权限必须正确设置", "PinningServiceAPI权限必须正确设置")
 	//
 	//// CAR文件上传
-	//ErrCarUploadFileParseFail = NewBizError(errCarUploadFileParseFail, "CAR上传文件解析失败", "CAR上传文件解析失败")
+	//ErrCarUploadFileParseFail = NewBizError(errCarUploadFileFail, "CAR上传文件解析失败", "CAR上传文件解析失败")
 )
 
 //var (
