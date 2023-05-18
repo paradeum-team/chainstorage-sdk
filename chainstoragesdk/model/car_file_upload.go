@@ -11,6 +11,7 @@ type CarFileUploadReq struct {
 	ShardingSha256  string `json:"shardingSha256" comment:"分片sha256"`
 	ShardingNo      int    `json:"shardingNo" comment:"分片序号"`
 	ShardingAmount  int    `json:"shardingAmount" comment:"分片数量"`
+	CarFileCid      string `json:"carFileCid" comment:"Car文件CID"`
 }
 
 type ShardingCarFileUploadResponse struct {

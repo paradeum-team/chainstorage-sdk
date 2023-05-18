@@ -7,7 +7,6 @@ import (
 	"chainstoragesdk/model"
 	"chainstoragesdk/utils"
 	"fmt"
-	ipldfmt "github.com/ipfs/go-ipld-format"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/ulule/deepcopier"
@@ -238,16 +237,16 @@ func UploadData(sdk *chainstoragesdk.CssClient, bucketId int, dataPath string) (
 	//}(fileDestination)
 
 	// 解析CAR文件，获取DAG信息，获取文件或目录的CID
-	linkContent := ipldfmt.Link{}
-	err = sdk.Car.ParseCarFile(fileDestination, &linkContent)
+	rootLink := model.RootLink{}
+	err = sdk.Car.ParseCarFile(fileDestination, &rootLink)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
 		return response, code.ErrCarUploadFileParseCarFileFail
 	}
 
-	objectCid := linkContent.Cid.String()
-	objectSize := int64(linkContent.Size)
-	objectName := linkContent.Name
+	objectCid := rootLink.Cid.String()
+	objectSize := int64(rootLink.Size)
+	objectName := rootLink.Name
 
 	// 设置请求参数
 	carFileUploadReq := model.CarFileUploadReq{}

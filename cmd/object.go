@@ -804,12 +804,12 @@ func objectDownloadRunOutput(cmd *cobra.Command, args []string, resp model.Objec
 		processError("get", err, args)
 	}
 
-	objectDownloadOutput := ObjectDownloadOutput{
-		RequestId: resp.RequestId,
-		Code:      resp.Code,
-		Msg:       resp.Msg,
-		Status:    resp.Status,
-	}
+	//objectDownloadOutput := ObjectDownloadOutput{
+	//	RequestId: resp.RequestId,
+	//	Code:      resp.Code,
+	//	Msg:       resp.Msg,
+	//	Status:    resp.Status,
+	//}
 
 	//	下载对象
 	//	通过命令下载固定桶内的对象数据
@@ -857,7 +857,7 @@ Name: {{.ObjectName}}
 		processError("get", err, args)
 	}
 
-	err = t.Execute(os.Stdout, objectDownloadOutput)
+	err = t.Execute(os.Stdout, resp)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("err:%+v", resp)

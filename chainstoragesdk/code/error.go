@@ -69,6 +69,7 @@ const (
 	errCarUploadFileComputeCarFileHashFail
 	errCarUploadFileChunkCarFileFail
 	errCarUploadFileReferenceObjcetFail
+	errCarUploadFileCidNotEqualRawCid
 )
 
 var (

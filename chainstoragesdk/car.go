@@ -128,11 +128,13 @@ func (c *Car) UploadCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResp
 	objectCid := req.ObjectCid
 	objectName := req.ObjectName
 	fileDestination := req.FileDestination
+	carFileCid := req.CarFileCid
 
 	params := map[string]string{
-		"bucketId":  strconv.Itoa(bucketId),
-		"rawSha256": rawSha256,
-		"objectCid": objectCid,
+		"bucketId":   strconv.Itoa(bucketId),
+		"rawSha256":  rawSha256,
+		"objectCid":  objectCid,
+		"carFileCid": carFileCid,
 	}
 	//params := map[string]interface{}{
 	//	"bucketId":  bucketId,
@@ -182,6 +184,7 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 	fileDestination := req.FileDestination
 	shardingSha256 := req.ShardingSha256
 	shardingNo := req.ShardingNo
+	carFileCid := req.CarFileCid
 
 	params := map[string]string{
 		"bucketId":       strconv.Itoa(bucketId),
@@ -189,6 +192,7 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 		"objectCid":      objectCid,
 		"shardingSha256": shardingSha256,
 		"shardingNo":     strconv.Itoa(shardingNo),
+		"carFileCid":     carFileCid,
 	}
 	//params := map[string]interface{}{
 	//	"bucketId":  bucketId,
@@ -490,7 +494,7 @@ func chunkCarFile(carFilePath string, targetSize int, strategy carbites.Strategy
 }
 
 // parse a dag from a car file
-func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
+func parseCarDag(carFilePath string, rootLink *model.RootLink) error {
 	bs, err := blockstore.OpenReadOnly(carFilePath)
 	if err != nil {
 		return err
@@ -508,6 +512,8 @@ func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
 	}
 
 	rootCid := roots[0]
+	fmt.Printf("rootCid:%s\n", rootCid.String())
+
 	block, err := bs.Get(context.Background(), rootCid)
 	if err != nil {
 		fmt.Printf("parseCarDag:blockstore.get(), Error:%+v\n", err)
@@ -530,9 +536,11 @@ func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
 		return fmt.Errorf("there aren't any IPFS Merkle DAG Link between Nodes")
 	}
 
-	linkContent.Cid = link.Cid
-	linkContent.Name = link.Name
-	linkContent.Size = link.Size
+	rootLink.RootCid = rootCid
+	rootLink.Cid = link.Cid
+	rootLink.Name = link.Name
+	rootLink.Size = link.Size
+	fmt.Printf("linkCid:%s\n", link.Cid.String())
 
 	return nil
 }
@@ -563,8 +571,8 @@ func (c *Car) generateFileName(prefix, suffix string) string {
 	return filepath.Join(carFileGenerationPath, prefix+suffix)
 }
 
-func (c *Car) ParseCarFile(carFilePath string, linkContent *ipldfmt.Link) error {
-	return parseCarDag(carFilePath, linkContent)
+func (c *Car) ParseCarFile(carFilePath string, rootLink *model.RootLink) error {
+	return parseCarDag(carFilePath, rootLink)
 }
 
 func (c *Car) SliceBigCarFile(carFilePath string) error {
@@ -728,16 +736,17 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	//}(fileDestination)
 
 	// 解析CAR文件，获取DAG信息，获取文件或目录的CID
-	linkContent := ipldfmt.Link{}
-	err = parseCarDag(fileDestination, &linkContent)
+	rootLink := model.RootLink{}
+	err = parseCarDag(fileDestination, &rootLink)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
 		return response, code.ErrCarUploadFileParseCarFileFail
 	}
 
-	objectCid := linkContent.Cid.String()
-	objectSize := int64(linkContent.Size)
-	objectName := linkContent.Name
+	rootCid := rootLink.RootCid.String()
+	objectCid := rootLink.Cid.String()
+	objectSize := int64(rootLink.Size)
+	objectName := rootLink.Name
 
 	// 设置请求参数
 	carFileUploadReq := model.CarFileUploadReq{}
@@ -746,6 +755,7 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	carFileUploadReq.ObjectSize = objectSize
 	carFileUploadReq.ObjectName = objectName
 	carFileUploadReq.FileDestination = dataPath
+	carFileUploadReq.CarFileCid = rootCid
 
 	// 上传为目录的情况
 	if fileInfo.IsDir() {
