@@ -129,12 +129,15 @@ func (c *Car) UploadCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResp
 	objectName := req.ObjectName
 	fileDestination := req.FileDestination
 	carFileCid := req.CarFileCid
+	objectSize := strconv.FormatInt(req.ObjectSize, 10)
 
 	params := map[string]string{
 		"bucketId":   strconv.Itoa(bucketId),
 		"rawSha256":  rawSha256,
 		"objectCid":  objectCid,
 		"carFileCid": carFileCid,
+		"objectName": objectName,
+		"objectSize": objectSize,
 	}
 	//params := map[string]interface{}{
 	//	"bucketId":  bucketId,
@@ -164,7 +167,6 @@ func (c *Car) UploadCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResp
 		return response, err
 	}
 
-	//fmt.Printf("response:%+v", response)
 	return response, nil
 }
 
@@ -185,6 +187,7 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 	shardingSha256 := req.ShardingSha256
 	shardingNo := req.ShardingNo
 	carFileCid := req.CarFileCid
+	objectSize := strconv.FormatInt(req.ObjectSize, 10)
 
 	params := map[string]string{
 		"bucketId":       strconv.Itoa(bucketId),
@@ -193,6 +196,7 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 		"shardingSha256": shardingSha256,
 		"shardingNo":     strconv.Itoa(shardingNo),
 		"carFileCid":     carFileCid,
+		"objectSize":     objectSize,
 	}
 	//params := map[string]interface{}{
 	//	"bucketId":  bucketId,
@@ -222,7 +226,6 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 		return response, err
 	}
 
-	//fmt.Printf("response:%+v", response)
 	return response, nil
 }
 
@@ -336,7 +339,6 @@ func (c *Car) ConfirmShardingCarFiles(req *model.CarFileUploadReq) (model.Object
 		return response, err
 	}
 
-	//fmt.Printf("response:%+v", response)
 	return response, nil
 }
 
@@ -512,7 +514,7 @@ func parseCarDag(carFilePath string, rootLink *model.RootLink) error {
 	}
 
 	rootCid := roots[0]
-	fmt.Printf("rootCid:%s\n", rootCid.String())
+	//fmt.Printf("rootCid:%s\n", rootCid.String())
 
 	block, err := bs.Get(context.Background(), rootCid)
 	if err != nil {
@@ -540,7 +542,7 @@ func parseCarDag(carFilePath string, rootLink *model.RootLink) error {
 	rootLink.Cid = link.Cid
 	rootLink.Name = link.Name
 	rootLink.Size = link.Size
-	fmt.Printf("linkCid:%s\n", link.Cid.String())
+	//fmt.Printf("linkCid:%s\n", link.Cid.String())
 
 	return nil
 }
@@ -617,8 +619,8 @@ func (c *Car) GenerateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 	defer bigCarFile.Close()
 
 	// CAR文件分片设置
-	targetSize := c.Config.CarFileShardingThreshold * 10 //1024 * 1024     // 1MiB chunks
-	strategy := carbites.Treewalk                        // also carbites.Treewalk
+	targetSize := c.Config.CarFileShardingThreshold //1024 * 1024     // 1MiB chunks
+	strategy := carbites.Treewalk                   // also carbites.Treewalk
 	spltr, _ := carbites.Split(bigCarFile, targetSize, strategy)
 
 	//shardingCarFileDestinationList := []string{}
@@ -650,6 +652,8 @@ func (c *Car) GenerateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 		shardingFileDestination := strings.Replace(fileDestination, filepath.Ext(fileDestination), filename, 1)
 		//shardingCarFileDestinationList = append(shardingCarFileDestinationList, shardingFileDestination)
 
+		chunkSize := int64(len(bytes))
+
 		// 生成分片文件
 		//ioutil.WriteFile(fmt.Sprintf("chunk-%d.car", shardingNo), bytes, 0644)
 		err = os.WriteFile(shardingFileDestination, bytes, 0644)
@@ -674,9 +678,19 @@ func (c *Car) GenerateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 
 		// 设置分片请求对象
 		shardingCarFileUploadReq := model.CarFileUploadReq{}
-		deepcopier.Copy(&req).To(&shardingCarFileUploadReq)
+		deepcopier.Copy(req).To(&shardingCarFileUploadReq)
+		shardingCarFileUploadReq.FileDestination = shardingFileDestination
 		shardingCarFileUploadReq.ShardingSha256 = shardingSha256
 		shardingCarFileUploadReq.ShardingNo = shardingNo
+
+		//// todo: remove it
+		//rootLink := model.RootLink{}
+		//parseCarDag(shardingFileDestination, &rootLink)
+		//rootCid := rootLink.RootCid.String()
+		//size := int64(rootLink.Size)
+		//shardingCarFileUploadReq.CarFileCid = rootCid
+		shardingCarFileUploadReq.ObjectSize = chunkSize
+
 		*shardingCarFileUploadReqs = append(*shardingCarFileUploadReqs, shardingCarFileUploadReq)
 	}
 
