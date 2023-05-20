@@ -1,0 +1,2 @@
+
+CGO_ENABLED=0 GOARCH=amd64  GOOS=linux go build -a -v -installsuffix cgo -o bin/chainstorage-cmd.

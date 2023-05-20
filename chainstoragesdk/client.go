@@ -7,9 +7,9 @@ import (
 type SdkConfig Configuration
 
 var once = sync.Once{}
-var mClient *myClient
+var mClient *CssClient
 
-type myClient struct {
+type CssClient struct {
 	Config     *Configuration
 	Logger     *PldLogger
 	httpClient *RestyClient
@@ -18,15 +18,15 @@ type myClient struct {
 	Car        *Car
 }
 
-func newClient() (*myClient, error) {
+func newClient() (*CssClient, error) {
 	var err error
 	once.Do(func() {
 		initConfig()
 
-		mClient = &myClient{}
-		mClient.Config = &myConfig
+		mClient = &CssClient{}
+		mClient.Config = &cssConfig
 
-		mClient.Logger = GetLogger(&myLogger)
+		mClient.Logger = GetLogger(&cssLoggerConfig)
 
 		mClient.httpClient = &RestyClient{Config: mClient.Config}
 		mClient.Bucket = &Bucket{Config: mClient.Config, Client: mClient.httpClient, logger: mClient.Logger.logger}
@@ -38,7 +38,7 @@ func newClient() (*myClient, error) {
 	return mClient, err
 }
 
-func New() (*myClient, error) {
+func New() (*CssClient, error) {
 
 	return newClient()
 }

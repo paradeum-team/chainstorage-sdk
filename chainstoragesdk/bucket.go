@@ -1,13 +1,13 @@
 package chainstoragesdk
 
 import (
-	"chainstorage-sdk/chainstoragesdk/code"
-	"chainstorage-sdk/chainstoragesdk/consts"
-	"chainstorage-sdk/chainstoragesdk/model"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/kataras/golog"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
+	"github.com/paradeum-team/chainstorage-sdk/model"
 	"github.com/ulule/deepcopier"
 	"net/http"
 	"net/url"
@@ -48,7 +48,7 @@ func (b *Bucket) GetBucketList(bucketName string, pageSize, pageIndex int) (mode
 	// 请求Url
 	urlQuery = strings.TrimSuffix(urlQuery, "&")
 
-	//apiBaseAddress := conf.myConfig.ChainStorageApiBaseAddress
+	//apiBaseAddress := conf.cssConfig.ChainStorageApiBaseAddress
 	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
 	apiPath := "api/v1/buckets"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
@@ -143,7 +143,7 @@ func (b *Bucket) EmptyBucket(bucketId int) (model.BucketEmptyResponse, error) {
 
 	// 参数设置
 	if bucketId <= 0 {
-		return response, errors.New("请输入正确的桶ID.")
+		return response, code.ErrInvalidBucketId
 	}
 
 	params := map[string]interface{}{
@@ -186,7 +186,7 @@ func (b *Bucket) RemoveBucket(bucketId int, autoEmptyBucketData bool) (model.Buc
 
 	// 参数设置
 	if bucketId <= 0 {
-		return response, errors.New("请输入正确的桶ID.")
+		return response, code.ErrInvalidBucketId
 	}
 
 	// 自动清空数据
@@ -221,6 +221,44 @@ func (b *Bucket) RemoveBucket(bucketId int, autoEmptyBucketData bool) (model.Buc
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		b.logger.Errorf(fmt.Sprintf("API:RemoveBucket:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
+// 根据桶名称获取桶数据
+func (b *Bucket) GetBucketByName(bucketName string) (model.BucketCreateResponse, error) {
+	response := model.BucketCreateResponse{}
+
+	// 参数设置
+	if err := checkBucketName(bucketName); err != nil {
+		return response, err
+	}
+
+	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	apiPath := fmt.Sprintf("api/v1/bucket/name/%s", url.QueryEscape(bucketName))
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := b.Client.RestyGet(apiUrl)
+	if err != nil {
+		b.logger.Errorf(fmt.Sprintf("API:GetBucketByName:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		b.logger.Errorf(fmt.Sprintf("API:GetBucketByName:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		b.logger.Errorf(fmt.Sprintf("API:GetBucketByName:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
 
 		return response, err
 	}

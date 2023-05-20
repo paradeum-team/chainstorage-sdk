@@ -1,13 +1,13 @@
 package chainstoragesdk
 
 import (
-	"chainstorage-sdk/chainstoragesdk/code"
-	"chainstorage-sdk/chainstoragesdk/model"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ipfs/go-cid"
 	"github.com/kataras/golog"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/model"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -29,7 +29,7 @@ func (o *Object) GetObjectList(bucketId int, objectItem string, pageSize, pageIn
 	// 参数设置
 	urlQuery := ""
 	if bucketId <= 0 {
-		return response, errors.New("请输入正确的桶ID.")
+		return response, code.ErrInvalidBucketId
 	}
 	urlQuery += fmt.Sprintf("bucketId=%d&", bucketId)
 
@@ -87,7 +87,7 @@ func (o *Object) RemoveObject(objectIds []int) (model.ObjectRemoveResponse, erro
 
 	// 参数设置
 	if len(objectIds) == 0 {
-		return response, errors.New("请输入正确的对象ID列表.")
+		return response, code.ErrInvalidObjectIds
 	}
 
 	params := map[string]interface{}{
@@ -130,7 +130,7 @@ func (o *Object) RenameObject(objectId int, objectName string, isOverwrite bool)
 
 	// 参数设置
 	if objectId <= 0 {
-		return response, errors.New("请输入正确的对象ID.")
+		return response, code.ErrInvalidObjectId
 	}
 
 	if err := checkObjectName(objectName); err != nil {
@@ -183,7 +183,7 @@ func (o *Object) MarkObject(objectId int, isMarked bool) (model.ObjectMarkRespon
 
 	// 参数设置
 	if objectId <= 0 {
-		return response, errors.New("请输入正确的对象ID.")
+		return response, code.ErrInvalidObjectId
 	}
 
 	markObject := 0
@@ -231,13 +231,13 @@ func (o *Object) IsExistObjectByCid(objectCid string) (model.ObjectExistResponse
 
 	// 参数设置
 	if len(objectCid) <= 0 {
-		return response, errors.New("请输入正确的对象CID.")
+		return response, code.ErrInvalidObjectCid
 	}
 
 	// CID检查
 	_, err := cid.Decode(objectCid)
 	if err != nil {
-		return response, errors.New("请输入正确的对象CID.")
+		return response, code.ErrInvalidObjectCid
 	}
 
 	urlQuery := url.QueryEscape(objectCid)
@@ -265,6 +265,53 @@ func (o *Object) IsExistObjectByCid(objectCid string) (model.ObjectExistResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
 		o.logger.Errorf(fmt.Sprintf("API:IsExistObjectByCid:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
+// 根据CID检查是否已经存在Object
+func (o *Object) GetObjectByName(bucketId int, objectName string) (model.ObjectCreateResponse, error) {
+	response := model.ObjectCreateResponse{}
+
+	// 参数设置
+	urlQuery := "?"
+	if bucketId <= 0 {
+		return response, code.ErrInvalidBucketId
+	}
+	urlQuery += fmt.Sprintf("bucketId=%d&", bucketId)
+
+	// 参数设置
+	if len(objectName) <= 0 {
+		return response, code.ErrInvalidObjectName
+	}
+	urlQuery += fmt.Sprintf("objectName=%s", url.QueryEscape(objectName))
+
+	// 请求Url
+	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiPath := fmt.Sprintf("api/v1/object/find/name%s", urlQuery)
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := o.Client.RestyGet(apiUrl)
+	if err != nil {
+		o.logger.Errorf(fmt.Sprintf("API:GetObjectByName:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		o.logger.Errorf(fmt.Sprintf("API:GetObjectByName:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		o.logger.Errorf(fmt.Sprintf("API:GetObjectByName:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
 
 		return response, err
 	}

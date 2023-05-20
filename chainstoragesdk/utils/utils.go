@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"chainstorage-sdk/chainstoragesdk/consts"
 	"fmt"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
 	"io"
 	"log"
 	"math/rand"

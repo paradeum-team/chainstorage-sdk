@@ -2,8 +2,6 @@ package chainstoragesdk
 
 import (
 	"bytes"
-	"chainstorage-sdk/chainstoragesdk/model"
-	"chainstorage-sdk/chainstoragesdk/utils"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
@@ -23,6 +21,10 @@ import (
 	"github.com/kataras/golog"
 	"github.com/multiformats/go-multicodec"
 	"github.com/multiformats/go-multihash"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
+	"github.com/paradeum-team/chainstorage-sdk/model"
+	"github.com/paradeum-team/chainstorage-sdk/utils"
 	"github.com/ulule/deepcopier"
 	"io"
 	"net/http"
@@ -126,11 +128,16 @@ func (c *Car) UploadCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResp
 	objectCid := req.ObjectCid
 	objectName := req.ObjectName
 	fileDestination := req.FileDestination
+	carFileCid := req.CarFileCid
+	objectSize := strconv.FormatInt(req.ObjectSize, 10)
 
 	params := map[string]string{
-		"bucketId":  strconv.Itoa(bucketId),
-		"rawSha256": rawSha256,
-		"objectCid": objectCid,
+		"bucketId":   strconv.Itoa(bucketId),
+		"rawSha256":  rawSha256,
+		"objectCid":  objectCid,
+		"carFileCid": carFileCid,
+		"objectName": objectName,
+		"objectSize": objectSize,
 	}
 	//params := map[string]interface{}{
 	//	"bucketId":  bucketId,
@@ -160,7 +167,6 @@ func (c *Car) UploadCarFile(req *model.CarFileUploadReq) (model.ObjectCreateResp
 		return response, err
 	}
 
-	//fmt.Printf("response:%+v", response)
 	return response, nil
 }
 
@@ -180,6 +186,8 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 	fileDestination := req.FileDestination
 	shardingSha256 := req.ShardingSha256
 	shardingNo := req.ShardingNo
+	carFileCid := req.CarFileCid
+	objectSize := strconv.FormatInt(req.ObjectSize, 10)
 
 	params := map[string]string{
 		"bucketId":       strconv.Itoa(bucketId),
@@ -187,6 +195,8 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 		"objectCid":      objectCid,
 		"shardingSha256": shardingSha256,
 		"shardingNo":     strconv.Itoa(shardingNo),
+		"carFileCid":     carFileCid,
+		"objectSize":     objectSize,
 	}
 	//params := map[string]interface{}{
 	//	"bucketId":  bucketId,
@@ -216,7 +226,6 @@ func (c *Car) UploadShardingCarFile(req *model.CarFileUploadReq) (model.Sharding
 		return response, err
 	}
 
-	//fmt.Printf("response:%+v", response)
 	return response, nil
 }
 
@@ -330,7 +339,6 @@ func (c *Car) ConfirmShardingCarFiles(req *model.CarFileUploadReq) (model.Object
 		return response, err
 	}
 
-	//fmt.Printf("response:%+v", response)
 	return response, nil
 }
 
@@ -488,7 +496,7 @@ func chunkCarFile(carFilePath string, targetSize int, strategy carbites.Strategy
 }
 
 // parse a dag from a car file
-func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
+func parseCarDag(carFilePath string, rootLink *model.RootLink) error {
 	bs, err := blockstore.OpenReadOnly(carFilePath)
 	if err != nil {
 		return err
@@ -506,6 +514,8 @@ func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
 	}
 
 	rootCid := roots[0]
+	//fmt.Printf("rootCid:%s\n", rootCid.String())
+
 	block, err := bs.Get(context.Background(), rootCid)
 	if err != nil {
 		fmt.Printf("parseCarDag:blockstore.get(), Error:%+v\n", err)
@@ -528,9 +538,11 @@ func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
 		return fmt.Errorf("there aren't any IPFS Merkle DAG Link between Nodes")
 	}
 
-	linkContent.Cid = link.Cid
-	linkContent.Name = link.Name
-	linkContent.Size = link.Size
+	rootLink.RootCid = rootCid
+	rootLink.Cid = link.Cid
+	rootLink.Name = link.Name
+	rootLink.Size = link.Size
+	//fmt.Printf("linkCid:%s\n", link.Cid.String())
 
 	return nil
 }
@@ -538,7 +550,7 @@ func parseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
 // endregion CAR file
 
 // TempFileName generates a temporary filename for use in testing or whatever
-func (c *Car) generateTempFileName(prefix, suffix string) string {
+func (c *Car) GenerateTempFileName(prefix, suffix string) string {
 	randBytes := make([]byte, 16)
 	rand.Read(randBytes)
 
@@ -561,8 +573,8 @@ func (c *Car) generateFileName(prefix, suffix string) string {
 	return filepath.Join(carFileGenerationPath, prefix+suffix)
 }
 
-func TempParseCarDag(carFilePath string, linkContent *ipldfmt.Link) error {
-	return parseCarDag(carFilePath, linkContent)
+func (c *Car) ParseCarFile(carFilePath string, rootLink *model.RootLink) error {
+	return parseCarDag(carFilePath, rootLink)
 }
 
 func (c *Car) SliceBigCarFile(carFilePath string) error {
@@ -597,7 +609,7 @@ func (c *Car) SliceBigCarFile(carFilePath string) error {
 }
 
 // 生成CAR分片文件
-func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarFileUploadReqs *[]model.CarFileUploadReq) error {
+func (c *Car) GenerateShardingCarFiles(req *model.CarFileUploadReq, shardingCarFileUploadReqs *[]model.CarFileUploadReq) error {
 	fileDestination := req.FileDestination
 
 	bigCarFile, err := os.Open(fileDestination)
@@ -607,8 +619,8 @@ func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 	defer bigCarFile.Close()
 
 	// CAR文件分片设置
-	targetSize := c.Config.CarFileShardingThreshold * 10 //1024 * 1024     // 1MiB chunks
-	strategy := carbites.Treewalk                        // also carbites.Treewalk
+	targetSize := c.Config.CarFileShardingThreshold //1024 * 1024     // 1MiB chunks
+	strategy := carbites.Treewalk                   // also carbites.Treewalk
 	spltr, _ := carbites.Split(bigCarFile, targetSize, strategy)
 
 	//shardingCarFileDestinationList := []string{}
@@ -640,6 +652,8 @@ func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 		shardingFileDestination := strings.Replace(fileDestination, filepath.Ext(fileDestination), filename, 1)
 		//shardingCarFileDestinationList = append(shardingCarFileDestinationList, shardingFileDestination)
 
+		chunkSize := int64(len(bytes))
+
 		// 生成分片文件
 		//ioutil.WriteFile(fmt.Sprintf("chunk-%d.car", shardingNo), bytes, 0644)
 		err = os.WriteFile(shardingFileDestination, bytes, 0644)
@@ -664,9 +678,19 @@ func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 
 		// 设置分片请求对象
 		shardingCarFileUploadReq := model.CarFileUploadReq{}
-		deepcopier.Copy(&req).To(&shardingCarFileUploadReq)
+		deepcopier.Copy(req).To(&shardingCarFileUploadReq)
+		shardingCarFileUploadReq.FileDestination = shardingFileDestination
 		shardingCarFileUploadReq.ShardingSha256 = shardingSha256
 		shardingCarFileUploadReq.ShardingNo = shardingNo
+
+		//// todo: remove it
+		//rootLink := model.RootLink{}
+		//parseCarDag(shardingFileDestination, &rootLink)
+		//rootCid := rootLink.RootCid.String()
+		//size := int64(rootLink.Size)
+		//shardingCarFileUploadReq.CarFileCid = rootCid
+		shardingCarFileUploadReq.ObjectSize = chunkSize
+
 		*shardingCarFileUploadReqs = append(*shardingCarFileUploadReqs, shardingCarFileUploadReq)
 	}
 
@@ -676,7 +700,7 @@ func (c *Car) generateShardingCarFiles(req *model.CarFileUploadReq, shardingCarF
 		// todo: add constant
 		fmt.Printf("Error:%+v\n", err)
 		//return err
-		return errors.New("生成CAR文件分片操作失败")
+		return code.ErrCarUploadFileChunkCarFileFail
 	}
 
 	req.ShardingAmount = shardingAmount
@@ -692,21 +716,21 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 
 	// 数据路径为空
 	if len(dataPath) == 0 {
-		return response, errors.New("数据路径为空")
+		return response, code.ErrCarUploadFileInvalidDataPath
 	}
 
 	// 数据路径无效
 	fileInfo, err := os.Stat(dataPath)
 	if os.IsNotExist(err) {
-		return response, errors.New("数据路径无效")
+		return response, code.ErrCarUploadFileInvalidDataPath
 	} else if err != nil {
 		return response, err
 	}
 
 	// add constant
 	carVersion := 1
-	fileDestination := c.generateTempFileName(utils.CurrentDate()+"_", ".tmp")
-	//fileDestination := generateTempFileName("", ".tmp")
+	fileDestination := c.GenerateTempFileName(utils.CurrentDate()+"_", ".tmp")
+	//fileDestination := GenerateTempFileName("", ".tmp")
 	fmt.Printf("UploadData carVersion:%d, fileDestination:%s, dataPath:%s\n", carVersion, fileDestination, dataPath)
 
 	// 创建Car文件
@@ -714,7 +738,7 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	err = createCar(ctx, carVersion, fileDestination, dataPath)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("创建Car文件失败")
+		return response, code.ErrCarUploadFileCreateCarFileFail
 	}
 	// todo: 清除CAR文件，添加utils
 	//defer func(objectSize string) {
@@ -726,16 +750,17 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	//}(fileDestination)
 
 	// 解析CAR文件，获取DAG信息，获取文件或目录的CID
-	linkContent := ipldfmt.Link{}
-	err = parseCarDag(fileDestination, &linkContent)
+	rootLink := model.RootLink{}
+	err = parseCarDag(fileDestination, &rootLink)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("解析CAR文件失败")
+		return response, code.ErrCarUploadFileParseCarFileFail
 	}
 
-	objectCid := linkContent.Cid.String()
-	objectSize := int64(linkContent.Size)
-	objectName := linkContent.Name
+	rootCid := rootLink.RootCid.String()
+	objectCid := rootLink.Cid.String()
+	objectSize := int64(rootLink.Size)
+	objectName := rootLink.Name
 
 	// 设置请求参数
 	carFileUploadReq := model.CarFileUploadReq{}
@@ -744,6 +769,7 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	carFileUploadReq.ObjectSize = objectSize
 	carFileUploadReq.ObjectName = objectName
 	carFileUploadReq.FileDestination = dataPath
+	carFileUploadReq.CarFileCid = rootCid
 
 	// 上传为目录的情况
 	if fileInfo.IsDir() {
@@ -751,14 +777,14 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 		// const (
 		//	ObjectTypeCodeDir   = 20000
 		// )
-		carFileUploadReq.ObjectTypeCode = 20000
+		carFileUploadReq.ObjectTypeCode = consts.ObjectTypeCodeDir
 	}
 
 	// 计算文件sha256
 	sha256, err := utils.GetFileSha256ByPath(dataPath)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("hash计算失败")
+		return response, code.ErrCarUploadFileComputeCarFileHashFail
 	}
 	carFileUploadReq.RawSha256 = sha256
 
@@ -767,17 +793,16 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	objectExistResponse, err := objectService.IsExistObjectByCid(objectCid)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		return response, errors.New("CID秒传检查失败")
+		return response, code.ErrCarUploadFileReferenceObjcetFail
 	}
 
 	// CID存在，执行秒传操作
 	objectExistCheck := objectExistResponse.Data
 	if objectExistCheck.IsExist {
-		carService := Car{}
-		response, err := carService.ReferenceObject(&carFileUploadReq)
+		response, err := c.ReferenceObject(&carFileUploadReq)
 		if err != nil {
 			fmt.Printf("Error:%+v\n", err)
-			//return response, errors.New("执行秒传操作失败")
+			return response, code.ErrCarUploadFileReferenceObjcetFail
 		}
 
 		return response, err
@@ -790,14 +815,18 @@ func (c *Car) UploadData(bucketId int, dataPath string) (model.ObjectCreateRespo
 	// 生成CAR分片文件上传
 	if carFileSize > int64(carFileShardingThreshold) {
 		//todo:分片上传
+		response, err = c.UploadBigCarFile(&carFileUploadReq)
+		if err != nil {
+			fmt.Printf("Error:%+v\n", err)
+			return response, code.ErrCarUploadFileFail
+		}
 	}
 
 	// 普通上传
-	carService := Car{}
-	response, err = carService.UploadCarFile(&carFileUploadReq)
+	response, err = c.UploadCarFile(&carFileUploadReq)
 	if err != nil {
 		fmt.Printf("Error:%+v\n", err)
-		//return response, errors.New("普通上传操作失败")
+		return response, code.ErrCarUploadFileFail
 	}
 
 	return response, err
@@ -809,7 +838,7 @@ func (c *Car) UploadBigCarFile(req *model.CarFileUploadReq) (model.ObjectCreateR
 
 	// 生成CAR分片文件
 	shardingCarFileUploadReqs := []model.CarFileUploadReq{}
-	err := c.generateShardingCarFiles(req, &shardingCarFileUploadReqs)
+	err := c.GenerateShardingCarFiles(req, &shardingCarFileUploadReqs)
 	if err != nil {
 		return response, err
 	}
@@ -822,8 +851,122 @@ func (c *Car) UploadBigCarFile(req *model.CarFileUploadReq) (model.ObjectCreateR
 	//
 	//}
 	for i, _ := range shardingCarFileUploadReqs {
-		carService := Car{}
-		carService.UploadShardingCarFile(&shardingCarFileUploadReqs[i])
+		c.UploadShardingCarFile(&shardingCarFileUploadReqs[i])
+	}
+
+	return response, nil
+}
+
+// 上传CAR文件
+func (c *Car) UploadCarFileExt(req *model.CarFileUploadReq, extReader io.Reader) (model.ObjectCreateResponse, error) {
+	response := model.ObjectCreateResponse{}
+
+	// 请求Url
+	apiBaseAddress := c.Config.ChainStorageApiBaseAddress
+	apiPath := "api/v1/upload/car/file"
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	bucketId := req.BucketId
+	rawSha256 := req.RawSha256
+	objectCid := req.ObjectCid
+	objectName := req.ObjectName
+	fileDestination := req.FileDestination
+	carFileCid := req.CarFileCid
+	objectSize := strconv.FormatInt(req.ObjectSize, 10)
+
+	params := map[string]string{
+		"bucketId":   strconv.Itoa(bucketId),
+		"rawSha256":  rawSha256,
+		"objectCid":  objectCid,
+		"carFileCid": carFileCid,
+		"objectName": objectName,
+		"objectSize": objectSize,
+	}
+	//params := map[string]interface{}{
+	//	"bucketId":  bucketId,
+	//	"rawSha256": rawSha256,
+	//	"objectCid": objectCid,
+	//}
+
+	// API调用
+	httpStatus, body, err := c.Client.RestyPostFormExt(objectName, fileDestination, params, apiUrl, extReader)
+	if err != nil {
+		c.logger.Errorf(fmt.Sprintf("API:UploadCarFile:HttpPost, apiUrl:%s, params:%+v, httpStatus:%d, err:%+v\n", apiUrl, params, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		c.logger.Errorf(fmt.Sprintf("API:UploadCarFile:HttpPost, apiUrl:%s, params:%+v, httpStatus:%d, body:%s\n", apiUrl, params, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		c.logger.Errorf(fmt.Sprintf("API:UploadCarFile:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
+// 上传CAR文件分片
+func (c *Car) UploadShardingCarFileExt(req *model.CarFileUploadReq, extReader io.Reader) (model.ShardingCarFileUploadResponse, error) {
+	response := model.ShardingCarFileUploadResponse{}
+
+	// 请求Url
+	apiBaseAddress := c.Config.ChainStorageApiBaseAddress
+	apiPath := "api/v1/upload/car/shard"
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	bucketId := req.BucketId
+	rawSha256 := req.RawSha256
+	objectCid := req.ObjectCid
+	objectName := req.ObjectName
+	fileDestination := req.FileDestination
+	shardingSha256 := req.ShardingSha256
+	shardingNo := req.ShardingNo
+	carFileCid := req.CarFileCid
+	objectSize := strconv.FormatInt(req.ObjectSize, 10)
+
+	params := map[string]string{
+		"bucketId":       strconv.Itoa(bucketId),
+		"rawSha256":      rawSha256,
+		"objectCid":      objectCid,
+		"shardingSha256": shardingSha256,
+		"shardingNo":     strconv.Itoa(shardingNo),
+		"carFileCid":     carFileCid,
+		"objectSize":     objectSize,
+	}
+	//params := map[string]interface{}{
+	//	"bucketId":  bucketId,
+	//	"rawSha256": rawSha256,
+	//	"objectCid": objectCid,
+	//}
+
+	// API调用
+	httpStatus, body, err := c.Client.RestyPostFormExt(objectName, fileDestination, params, apiUrl, extReader)
+	if err != nil {
+		c.logger.Errorf(fmt.Sprintf("API:UploadShardingCarFile:HttpPost, apiUrl:%s, params:%+v, httpStatus:%d, err:%+v\n", apiUrl, params, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		c.logger.Errorf(fmt.Sprintf("API:UploadShardingCarFile:HttpPost, apiUrl:%s, params:%+v, httpStatus:%d, body:%s\n", apiUrl, params, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		c.logger.Errorf(fmt.Sprintf("API:UploadShardingCarFile:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
 	}
 
 	return response, nil

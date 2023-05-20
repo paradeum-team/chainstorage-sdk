@@ -8,8 +8,8 @@ import (
 )
 
 var appConfig ApplicationConfig
-var myConfig Configuration
-var myLogger LoggerConf
+var cssConfig Configuration
+var cssLoggerConfig LoggerConf
 
 //var GatewayTimeout = 60
 //var Port int
@@ -57,13 +57,19 @@ type ApplicationConfig struct {
 
 func initConfig() {
 	//rand.Seed(time.Now().UnixNano())
-	config, err := gprofile.Profile(&ApplicationConfig{}, "./chainstorage-sdk.yaml", true)
+	//if len(configFile) == 0 {
+	//	configFile = "./github.com/paradeum-team/chainstorage-sdk.yaml"
+	//}
+
+	configFile := "./chainstorage-sdk.yaml"
+	config, err := gprofile.Profile(&ApplicationConfig{}, configFile, true)
 	if err != nil {
 		fmt.Errorf("Profile execute error", err)
 	}
+
 	appConfig = *config.(*ApplicationConfig)
-	myConfig = config.(*ApplicationConfig).Server
-	myLogger = config.(*ApplicationConfig).Logger
+	cssConfig = config.(*ApplicationConfig).Server
+	cssLoggerConfig = config.(*ApplicationConfig).Logger
 
 	//dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	//if err != nil {
@@ -72,26 +78,26 @@ func initConfig() {
 	//}
 
 	//check chain-storage-api base address
-	if len(myConfig.ChainStorageApiBaseAddress) > 0 {
-		chainStorageApiBaseAddress := myConfig.ChainStorageApiBaseAddress
+	if len(cssConfig.ChainStorageApiBaseAddress) > 0 {
+		chainStorageApiBaseAddress := cssConfig.ChainStorageApiBaseAddress
 		if !strings.HasPrefix(chainStorageApiBaseAddress, "http") {
 			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
 			os.Exit(1)
 		}
 
 		if !strings.HasSuffix(chainStorageApiBaseAddress, "/") {
-			myConfig.ChainStorageApiBaseAddress += "/"
+			cssConfig.ChainStorageApiBaseAddress += "/"
 		}
 	} else {
 		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
 		os.Exit(1)
 	}
 
-	if len(myConfig.ChainStorageApiToken) == 0 {
+	if len(cssConfig.ChainStorageApiToken) == 0 {
 		fmt.Println("ERROR: invalid chain-storage-api token in Configuration file, chain-storage-api token must not be empty")
 		os.Exit(1)
-	} else if !strings.HasPrefix(myConfig.ChainStorageApiToken, "Bearer ") {
-		myConfig.ChainStorageApiToken = "Bearer " + myConfig.ChainStorageApiToken
+	} else if !strings.HasPrefix(cssConfig.ChainStorageApiToken, "Bearer ") {
+		cssConfig.ChainStorageApiToken = "Bearer " + cssConfig.ChainStorageApiToken
 	}
 
 	//if _, err := os.Stat(filepath.Join(Config.AbsAFSDir, Config.AFSProgram)); os.IsExist(err) {
@@ -110,13 +116,13 @@ func initConfig() {
 
 func InitConfig2() {
 	//rand.Seed(time.Now().UnixNano())
-	config, err := gprofile.Profile(&ApplicationConfig{}, "./chainstorage-sdk.yaml", true)
+	config, err := gprofile.Profile(&ApplicationConfig{}, "./github.com/paradeum-team/chainstorage-sdk.yaml", true)
 	if err != nil {
 		fmt.Errorf("Profile execute error", err)
 	}
 	appConfig = *config.(*ApplicationConfig)
-	myConfig = config.(*ApplicationConfig).Server
-	myLogger = config.(*ApplicationConfig).Logger
+	cssConfig = config.(*ApplicationConfig).Server
+	cssLoggerConfig = config.(*ApplicationConfig).Logger
 
 	//dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	//if err != nil {
@@ -125,15 +131,15 @@ func InitConfig2() {
 	//}
 
 	//check chain-storage-api base address
-	if len(myConfig.ChainStorageApiBaseAddress) > 0 {
-		chainStorageApiBaseAddress := myConfig.ChainStorageApiBaseAddress
+	if len(cssConfig.ChainStorageApiBaseAddress) > 0 {
+		chainStorageApiBaseAddress := cssConfig.ChainStorageApiBaseAddress
 		if !strings.HasPrefix(chainStorageApiBaseAddress, "http") {
 			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
 			os.Exit(1)
 		}
 
 		if !strings.HasSuffix(chainStorageApiBaseAddress, "/") {
-			myConfig.ChainStorageApiBaseAddress += "/"
+			cssConfig.ChainStorageApiBaseAddress += "/"
 		}
 	} else {
 		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
