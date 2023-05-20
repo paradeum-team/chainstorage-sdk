@@ -4,7 +4,7 @@ go 1.20
 
 replace github.com/go-resty/resty => gopkg.in/resty.v1 v1.11.0
 
-require github.com/paradeum-team/chainstorage-sdk v0.0.0
+require github.com/paradeum-team/chainstorage-sdk v0.0.1
 
 require (
 	github.com/alanshaw/go-carbites v0.6.0 // indirect
