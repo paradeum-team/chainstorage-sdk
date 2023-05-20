@@ -3,6 +3,7 @@ package chainstoragesdk
 import (
 	"bytes"
 	"github.com/go-resty/resty"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -138,4 +139,41 @@ func (r *RestyClient) RestyDelete(url string, data interface{}) (httpStatus int,
 	body = resp.Body()
 
 	return resp.StatusCode(), body, nil
+}
+
+type ExtReader func(reader *io.Reader) io.Reader
+
+func (r *RestyClient) RestyPostFormExt(filename string, filePath string, formData map[string]string, url string, extReader io.Reader) (httpStatus int, body []byte, err error) {
+
+	var reader io.Reader
+	if extReader != nil {
+		//reader = bytes.NewReader(fileb)
+		reader = extReader
+	} else {
+		fileb, err := os.ReadFile(filePath)
+		if err != nil {
+			return http.StatusInternalServerError, nil, err
+		}
+		reader = bytes.NewReader(fileb)
+	}
+
+	resp, err := resty.
+		SetTimeout(time.Duration(60)*time.Second).
+		SetHeaders(*r.getHeaders()).
+		R().SetFileReader("file", filename, reader).
+		SetFormData(formData).
+		Post(url)
+
+	if err != nil {
+		if perr, ok := err.(net.Error); ok && perr.Timeout() {
+			return http.StatusGatewayTimeout, nil, err
+		} else {
+			return http.StatusServiceUnavailable, nil, err
+
+		}
+	}
+	defer resp.RawResponse.Body.Close()
+	body = resp.Body()
+
+	return resp.StatusCode(), body, err
 }
