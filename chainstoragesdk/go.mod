@@ -1,4 +1,4 @@
-module chainstoragesdk
+module github.com/paradeum-team/chainstorage-sdk
 
 go 1.20
 
@@ -22,7 +22,10 @@ require (
 	github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
 )
 
-require github.com/alanshaw/go-carbites v0.6.0
+require (
+	github.com/alanshaw/go-carbites v0.6.0
+	github.com/pkg/errors v0.9.1
+)
 
 require (
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
@@ -66,7 +69,6 @@ require (
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/petar/GoLLRB v0.0.0-20210522233825-ae3b015fd3e9 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/polydawn/refmt v0.89.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/tebeka/strftime v0.1.4 // indirect

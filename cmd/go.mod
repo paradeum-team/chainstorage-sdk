@@ -94,7 +94,7 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
-//chainstorage-sdk/chainstoragesdk v0.0.0
+//chainstorage-sdk/github.com/paradeum-team/chainstorage-sdk v0.0.0
 )
 
 replace github.com/go-resty/resty => gopkg.in/resty.v1 v1.11.0

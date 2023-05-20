@@ -2,10 +2,6 @@ package chainstoragesdk
 
 import (
 	"bytes"
-	"chainstoragesdk/code"
-	"chainstoragesdk/consts"
-	"chainstoragesdk/model"
-	"chainstoragesdk/utils"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
@@ -25,6 +21,10 @@ import (
 	"github.com/kataras/golog"
 	"github.com/multiformats/go-multicodec"
 	"github.com/multiformats/go-multihash"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
+	"github.com/paradeum-team/chainstorage-sdk/model"
+	"github.com/paradeum-team/chainstorage-sdk/utils"
 	"github.com/ulule/deepcopier"
 	"io"
 	"net/http"

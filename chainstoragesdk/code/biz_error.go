@@ -1,8 +1,8 @@
 package code
 
 import (
-	"chainstoragesdk/utils"
 	"fmt"
+	"github.com/paradeum-team/chainstorage-sdk/utils"
 	"strings"
 )
 

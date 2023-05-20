@@ -1,8 +1,8 @@
 package main
 
 import (
-	"chainstoragesdk"
 	"fmt"
+	"github.com/paradeum-team/chainstorage-sdk"
 )
 
 func main() {

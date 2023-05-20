@@ -1,13 +1,13 @@
 package chainstoragesdk
 
 import (
-	"chainstoragesdk/code"
-	"chainstoragesdk/consts"
-	"chainstoragesdk/model"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/kataras/golog"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
+	"github.com/paradeum-team/chainstorage-sdk/model"
 	"github.com/ulule/deepcopier"
 	"net/http"
 	"net/url"
