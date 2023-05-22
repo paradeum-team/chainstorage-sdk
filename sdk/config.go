@@ -61,7 +61,7 @@ func initConfig() {
 	//	configFile = "./github.com/paradeum-team/chainstorage-sdk.yaml"
 	//}
 
-	configFile := "./github.com/paradeum-team/chainstorage-sdk.yaml"
+	configFile := "./chainstorage-sdk.yaml"
 	config, err := gprofile.Profile(&ApplicationConfig{}, configFile, true)
 	if err != nil {
 		fmt.Errorf("Profile execute error", err)
@@ -116,7 +116,7 @@ func initConfig() {
 
 func InitConfig2() {
 	//rand.Seed(time.Now().UnixNano())
-	config, err := gprofile.Profile(&ApplicationConfig{}, "./github.com/paradeum-team/github.com/paradeum-team/chainstorage-sdk.yaml", true)
+	config, err := gprofile.Profile(&ApplicationConfig{}, "./chainstorage-sdk.yaml", true)
 	if err != nil {
 		fmt.Errorf("Profile execute error", err)
 	}
