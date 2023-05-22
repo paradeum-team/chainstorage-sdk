@@ -1,10 +1,6 @@
-module chainstorage-sdk
+module github.com/paradeum-team/chainstorage-sdk
 
 go 1.20
-
-replace github.com/go-resty/resty => gopkg.in/resty.v1 v1.11.0
-
-require github.com/paradeum-team/chainstorage-sdk v0.0.1
 
 require (
 	github.com/alanshaw/go-carbites v0.6.0 // indirect
@@ -81,6 +77,9 @@ require (
 	lukechampine.com/blake3 v1.1.7 // indirect
 )
 
-//replace chainstorage-sdk/github.com/paradeum-team/chainstorage-sdk => ./github.com/paradeum-team/chainstorage-sdk
+require github.com/paradeum-team/chainstorage-sdk/sdk v0.0.0-00010101000000-000000000000
 
-replace github.com/paradeum-team/chainstorage-sdk => ./chainstoragesdk
+replace (
+	github.com/go-resty/resty => gopkg.in/resty.v1 v1.11.0
+	github.com/paradeum-team/chainstorage-sdk/sdk => ./sdk
+)

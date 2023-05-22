@@ -1,10 +1,10 @@
 package main
 
 import (
-	"chainstoragesdk"
-	sdkcode "chainstoragesdk/code"
-	"chainstoragesdk/consts"
-	"chainstoragesdk/model"
+	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk/sdk"
+	sdkcode "github.com/paradeum-team/chainstorage-sdk/sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/sdk/consts"
+	"github.com/paradeum-team/chainstorage-sdk/sdk/model"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/ulule/deepcopier"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/paradeum-team/chainstorage-sdk"
+	"github.com/paradeum-team/chainstorage-sdk/sdk"
 )
 
 func main() {
