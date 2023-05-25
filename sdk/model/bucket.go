@@ -6,7 +6,7 @@ import (
 
 type Bucket struct {
 	Id                  int       `json:"id" comment:"桶ID"`
-	UserId              int       `json:"userId" comment:"用户ID"`
+	UserId              int       `json:"-" comment:"用户ID"`
 	BucketName          string    `json:"bucketName" comment:"桶名称（3-63字长度限制）"`
 	StorageNetworkCode  int       `json:"storageNetworkCode" comment:"存储网络编码（10001-IPFS）"`
 	BucketPrincipleCode int       `json:"bucketPrincipleCode" comment:"桶策略编码（10001-公开，10000-私有）"`

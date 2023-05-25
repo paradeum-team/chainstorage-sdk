@@ -55,13 +55,15 @@ type ApplicationConfig struct {
 	Logger LoggerConf    `profile:"logger"`
 }
 
-func initConfig() {
+func initConfig(configFile string) {
 	//rand.Seed(time.Now().UnixNano())
 	//if len(configFile) == 0 {
 	//	configFile = "./github.com/paradeum-team/chainstorage-sdk.yaml"
 	//}
+	if len(configFile) == 0 {
+		configFile = "./chainstorage-sdk.yaml"
+	}
 
-	configFile := "./chainstorage-sdk.yaml"
 	config, err := gprofile.Profile(&ApplicationConfig{}, configFile, true)
 	if err != nil {
 		fmt.Errorf("Profile execute error", err)

@@ -301,6 +301,7 @@ func (c *Car) ConfirmShardingCarFiles(req *model.CarFileUploadReq) (model.Object
 	objectName := req.ObjectName
 	objectTypeCode := req.ObjectTypeCode
 	shardingAmount := req.ShardingAmount
+	objectSize := req.ObjectSize
 	//fileDestination := req.FileDestination
 
 	//params := map[string]string{
@@ -315,6 +316,7 @@ func (c *Car) ConfirmShardingCarFiles(req *model.CarFileUploadReq) (model.Object
 		"objectName":     objectName,
 		"objectTypeCode": objectTypeCode,
 		"shardingAmount": shardingAmount,
+		"objectSize":     objectSize,
 	}
 
 	// API调用
