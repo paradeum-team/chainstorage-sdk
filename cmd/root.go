@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var sdkCfgFile string = ""
+
 var cmdDescription string = `
 USAGE
   gcscmd  - Golang ChainStorage Command line tool

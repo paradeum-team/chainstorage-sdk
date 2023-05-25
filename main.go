@@ -19,8 +19,8 @@ func main() {
 	//fmt.Printf("response:%+v\n", response)
 
 	// region 桶数据
-
-	sdk, err := chainstoragesdk.New()
+	sdkCfgFile := ""
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		fmt.Printf("error:%+v\n", err)
 		return

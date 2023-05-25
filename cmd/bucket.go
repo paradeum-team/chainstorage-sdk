@@ -15,10 +15,11 @@ import (
 	"time"
 )
 
+// var (
 //
-//var (
 //	offset int
-//)
+//
+// )
 
 func init() {
 	bucketListCmd.Flags().StringP("Bucket", "b", "", "桶名称")
@@ -78,7 +79,7 @@ func bucketListRun(cmd *cobra.Command, args []string) {
 		pageSize = offset
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -308,7 +309,7 @@ func bucketCreateRun(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -461,7 +462,7 @@ func bucketRemoveRun(cmd *cobra.Command, args []string) {
 
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -606,7 +607,7 @@ func bucketEmptyRun(cmd *cobra.Command, args []string) {
 	//
 	//}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)

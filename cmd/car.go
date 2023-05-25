@@ -68,7 +68,7 @@ func carUploadRun(cmd *cobra.Command, args []string) {
 		processError("ls", err, args)
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -397,7 +397,7 @@ func carImportRun(cmd *cobra.Command, args []string) {
 		processError("ls", err, args)
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(sdkCfgFile)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
