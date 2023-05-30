@@ -48,8 +48,8 @@ func (b *Bucket) GetBucketList(bucketName string, pageSize, pageIndex int) (mode
 	// 请求Url
 	urlQuery = strings.TrimSuffix(urlQuery, "&")
 
-	//apiBaseAddress := conf.cssConfig.ChainStorageApiBaseAddress
-	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	//apiBaseAddress := conf.cssConfig.ChainStorageApiEndpoint
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
 	apiPath := "api/v1/buckets"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -108,7 +108,7 @@ func (b *Bucket) CreateBucket(bucketName string, storageNetworkCode, bucketPrinc
 	}
 
 	// 请求Url
-	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
 	apiPath := "api/v1/bucket"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -151,7 +151,7 @@ func (b *Bucket) EmptyBucket(bucketId int) (model.BucketEmptyResponse, error) {
 	}
 
 	// 请求Url
-	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
 	apiPath := "api/v1/bucket/status/clean"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -200,7 +200,7 @@ func (b *Bucket) RemoveBucket(bucketId int, autoEmptyBucketData bool) (model.Buc
 	}
 
 	// 请求Url
-	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
 	apiPath := fmt.Sprintf("api/v1/bucket/%d", bucketId)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -237,7 +237,7 @@ func (b *Bucket) GetBucketByName(bucketName string) (model.BucketCreateResponse,
 		return response, err
 	}
 
-	apiBaseAddress := b.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
 	apiPath := fmt.Sprintf("api/v1/bucket/name/%s", url.QueryEscape(bucketName))
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 

@@ -23,10 +23,10 @@ type CssClient struct {
 	Car        *Car
 }
 
-func newClient(configFile string) (*CssClient, error) {
+func newClient(config *ApplicationConfig) (*CssClient, error) {
 	var err error
 	once.Do(func() {
-		initConfig(configFile)
+		initConfig(config)
 
 		mClient = &CssClient{}
 		mClient.Config = &cssConfig
@@ -43,16 +43,16 @@ func newClient(configFile string) (*CssClient, error) {
 	return mClient, err
 }
 
-func New(configFile string) (*CssClient, error) {
+func New(config *ApplicationConfig) (*CssClient, error) {
 
-	return newClient(configFile)
+	return newClient(config)
 }
 
 func (c *CssClient) GetIpfsVersion() (model.VersionResponse, error) {
 	response := model.VersionResponse{}
 
 	// 请求Url
-	apiBaseAddress := c.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := c.Config.ChainStorageApiEndpoint
 	apiPath := "ipfsVersion"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 

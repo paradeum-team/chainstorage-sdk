@@ -47,7 +47,7 @@ func (o *Object) GetObjectList(bucketId int, objectItem string, pageSize, pageIn
 
 	// 请求Url
 	urlQuery = strings.TrimSuffix(urlQuery, "&")
-	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := o.Config.ChainStorageApiEndpoint
 	apiPath := "api/v1/objects/search"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -95,7 +95,7 @@ func (o *Object) RemoveObject(objectIds []int) (model.ObjectRemoveResponse, erro
 	}
 
 	// 请求Url
-	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := o.Config.ChainStorageApiEndpoint
 	apiPath := "api/v1/object"
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -148,7 +148,7 @@ func (o *Object) RenameObject(objectId int, objectName string, isOverwrite bool)
 	}
 
 	// 请求Url
-	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := o.Config.ChainStorageApiEndpoint
 	apiPath := fmt.Sprintf("api/v1/object/name/%d", objectId)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -196,7 +196,7 @@ func (o *Object) MarkObject(objectId int, isMarked bool) (model.ObjectMarkRespon
 	}
 
 	// 请求Url
-	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := o.Config.ChainStorageApiEndpoint
 	apiPath := fmt.Sprintf("api/v1/object/mark/%d", objectId)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -243,7 +243,7 @@ func (o *Object) IsExistObjectByCid(objectCid string) (model.ObjectExistResponse
 	urlQuery := url.QueryEscape(objectCid)
 
 	// 请求Url
-	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := o.Config.ChainStorageApiEndpoint
 	apiPath := fmt.Sprintf("api/v1/object/existCid/%s", urlQuery)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 
@@ -290,7 +290,7 @@ func (o *Object) GetObjectByName(bucketId int, objectName string) (model.ObjectC
 	urlQuery += fmt.Sprintf("objectName=%s", url.QueryEscape(objectName))
 
 	// 请求Url
-	apiBaseAddress := o.Config.ChainStorageApiBaseAddress
+	apiBaseAddress := o.Config.ChainStorageApiEndpoint
 	apiPath := fmt.Sprintf("api/v1/object/find/name%s", urlQuery)
 	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 

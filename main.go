@@ -18,9 +18,11 @@ func main() {
 	//
 	//fmt.Printf("response:%+v\n", response)
 
+	config := chainstoragesdk.ApplicationConfig{}
+
 	// region 桶数据
-	sdkCfgFile := ""
-	sdk, err := chainstoragesdk.New(sdkCfgFile)
+	//sdkCfgFile := ""
+	sdk, err := chainstoragesdk.New(&config)
 	if err != nil {
 		fmt.Printf("error:%+v\n", err)
 		return
@@ -292,7 +294,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := "api/v1/apiKeys"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -347,7 +349,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := "api/v1/buckets"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -396,7 +398,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := "api/v1/bucket"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -437,7 +439,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := "api/v1/bucket/status/clean"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -474,7 +476,7 @@ func main() {
 //	//todo: bucket id check?
 //
 //	// 请求Url
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := fmt.Sprintf("api/v1/bucket/%d", bucketId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -533,7 +535,7 @@ func main() {
 //
 //	// 请求Url
 //	urlQuery = strings.TrimSuffix(urlQuery, "&")
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := "api/v1/objects/search"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -577,7 +579,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := "api/v1/object"
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -625,7 +627,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := fmt.Sprintf("api/v1/object/name/%d", objectId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //
@@ -671,7 +673,7 @@ func main() {
 //	}
 //
 //	// 请求Url
-//	apiBaseAddress := conf.myConfig.chainStorageApiBaseAddress
+//	apiBaseAddress := conf.myConfig.chainStorageAPIEndpoint
 //	apiPath := fmt.Sprintf("api/v1/object/mark/%d", objectId)
 //	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
 //

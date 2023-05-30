@@ -26,19 +26,22 @@ var cssLoggerConfig LoggerConf
 
 type Configuration struct {
 	// 链存服务API地址
-	ChainStorageApiBaseAddress string `profile:"chainStorageApiBaseAddress" profileDefault:"http://127.0.0.1:8821" json:"chainStorageApiBaseAddress"`
+	ChainStorageApiEndpoint string `profile:"chainStorageApiEndpoint" profileDefault:"http://127.0.0.1:8821" json:"chainStorageApiEndpoint"`
 
 	// CAR文件工作目录
-	CarFileGenerationPath string `profile:"carFileGenerationPath" profileDefault:"./temp/carfile" json:"carFileGenerationPath"`
+	CarFileWorkPath string `profile:"carFileWorkPath" profileDefault:"./tmp/carfile" json:"carFileWorkPath"`
 
 	// CAR文件分片阈值
-	CarFileShardingThreshold int `profile:"carFileShardingThreshold" profileDefault:"1048576" json:"carFileShardingThreshold"`
+	CarFileShardingThreshold int `profile:"carFileShardingThreshold" profileDefault:"10485760" json:"carFileShardingThreshold"`
 
 	// 链存服务API token
 	ChainStorageApiToken string `profile:"chainStorageApiToken" profileDefault:"" json:"chainStorageApiToken"`
 
 	// HTTP request user agent (K2请求需要)
 	HttpRequestUserAgent string `profile:"httpRequestUserAgent" profileDefault:"" json:"httpRequestUserAgent"`
+
+	// HTTP request user agent (K2请求需要)
+	HttpRequestOvertime int `profile:"httpRequestOvertime" profileDefault:"30" json:"httpRequestOvertime"`
 }
 
 type LoggerConf struct {
@@ -55,7 +58,59 @@ type ApplicationConfig struct {
 	Logger LoggerConf    `profile:"logger"`
 }
 
-func initConfig(configFile string) {
+func initConfig(config *ApplicationConfig) {
+	cssConfig = config.Server
+	cssLoggerConfig = config.Logger
+
+	//check chain-storage-api base address
+	if len(cssConfig.ChainStorageApiEndpoint) > 0 {
+		chainStorageAPIEndpoint := cssConfig.ChainStorageApiEndpoint
+		if !strings.HasPrefix(chainStorageAPIEndpoint, "http") {
+			fmt.Println("ERROR: invalid chain-storage-api endpoint in Configuration, chain-storage-api endpoint must be a valid http/https url, exiting")
+			os.Exit(1)
+		}
+
+		if !strings.HasSuffix(chainStorageAPIEndpoint, "/") {
+			cssConfig.ChainStorageApiEndpoint += "/"
+		}
+	} else {
+		fmt.Println("ERROR: no chain-storage-api endpoint provided in Configuration, at least 1 valid http/https chain-storage-api endpoint must be given, exiting")
+		os.Exit(1)
+	}
+
+	if len(cssConfig.ChainStorageApiToken) == 0 {
+		fmt.Println("ERROR: invalid chain-storage-api token in Configuration, chain-storage-api token must not be empty")
+		os.Exit(1)
+	} else if !strings.HasPrefix(cssConfig.ChainStorageApiToken, "Bearer ") {
+		cssConfig.ChainStorageApiToken = "Bearer " + cssConfig.ChainStorageApiToken
+	}
+
+	// CAR文件分片阈值，缺省10MB
+	carFileShardingThreshold := cssConfig.CarFileShardingThreshold
+	if carFileShardingThreshold <= 0 {
+		cssConfig.CarFileShardingThreshold = 10485760
+	}
+
+	// CAR文件工作目录
+	carFileWorkPath := cssConfig.CarFileWorkPath
+	if len(carFileWorkPath) == 0 {
+		cssConfig.CarFileWorkPath = `./tmp/carfile`
+	}
+
+	// HTTP request user agent (K2请求需要)
+	httpRequestUserAgent := cssConfig.HttpRequestUserAgent
+	if len(httpRequestUserAgent) == 0 {
+		cssConfig.HttpRequestUserAgent = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36`
+	}
+
+	// HTTP request overtime
+	httpRequestOvertime := cssConfig.HttpRequestOvertime
+	if httpRequestOvertime <= 0 {
+		cssConfig.HttpRequestOvertime = 30
+	}
+}
+
+func initConfigWithConfigFile(configFile string) {
 	//rand.Seed(time.Now().UnixNano())
 	//if len(configFile) == 0 {
 	//	configFile = "./github.com/paradeum-team/chainstorage-sdk.yaml"
@@ -80,15 +135,15 @@ func initConfig(configFile string) {
 	//}
 
 	//check chain-storage-api base address
-	if len(cssConfig.ChainStorageApiBaseAddress) > 0 {
-		chainStorageApiBaseAddress := cssConfig.ChainStorageApiBaseAddress
-		if !strings.HasPrefix(chainStorageApiBaseAddress, "http") {
+	if len(cssConfig.ChainStorageApiEndpoint) > 0 {
+		chainStorageAPIEndpoint := cssConfig.ChainStorageApiEndpoint
+		if !strings.HasPrefix(chainStorageAPIEndpoint, "http") {
 			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
 			os.Exit(1)
 		}
 
-		if !strings.HasSuffix(chainStorageApiBaseAddress, "/") {
-			cssConfig.ChainStorageApiBaseAddress += "/"
+		if !strings.HasSuffix(chainStorageAPIEndpoint, "/") {
+			cssConfig.ChainStorageApiEndpoint += "/"
 		}
 	} else {
 		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
@@ -116,7 +171,7 @@ func initConfig(configFile string) {
 
 }
 
-func InitConfig2() {
+func InitConfigWithDefault() {
 	//rand.Seed(time.Now().UnixNano())
 	config, err := gprofile.Profile(&ApplicationConfig{}, "./chainstorage-sdk.yaml", true)
 	if err != nil {
@@ -133,15 +188,15 @@ func InitConfig2() {
 	//}
 
 	//check chain-storage-api base address
-	if len(cssConfig.ChainStorageApiBaseAddress) > 0 {
-		chainStorageApiBaseAddress := cssConfig.ChainStorageApiBaseAddress
-		if !strings.HasPrefix(chainStorageApiBaseAddress, "http") {
+	if len(cssConfig.ChainStorageApiEndpoint) > 0 {
+		chainStorageAPIEndpoint := cssConfig.ChainStorageApiEndpoint
+		if !strings.HasPrefix(chainStorageAPIEndpoint, "http") {
 			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
 			os.Exit(1)
 		}
 
-		if !strings.HasSuffix(chainStorageApiBaseAddress, "/") {
-			cssConfig.ChainStorageApiBaseAddress += "/"
+		if !strings.HasSuffix(chainStorageAPIEndpoint, "/") {
+			cssConfig.ChainStorageApiEndpoint += "/"
 		}
 	} else {
 		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
