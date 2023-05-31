@@ -44,7 +44,7 @@ type Car struct {
 // 创建CAR文件
 func (c *Car) CreateCarFile(dataPath string, fileDestination string) error {
 	ctx := context.Background()
-	carVersion := 1
+	carVersion := c.Config.CarVersion
 	return createCar(ctx, carVersion, fileDestination, dataPath)
 }
 

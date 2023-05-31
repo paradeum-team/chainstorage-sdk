@@ -40,7 +40,7 @@ func newLogger(cfg *LoggerConf) *PldLogger {
 			return
 		}
 
-		logInfoPath := pldLoggerInstance.createGinSysLogPath("chainstorage")
+		logInfoPath := pldLoggerInstance.createGinSysLogPath("chainstorage-sdk")
 		/*file, err := os.OpenFile(logInfoPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 		if err != nil {
 			log.Printf("ERROR: %s\n", fmt.Sprintf("%s append|create failed:%v", logInfoPath, err))

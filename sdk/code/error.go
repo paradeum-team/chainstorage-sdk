@@ -70,6 +70,7 @@ const (
 	errCarUploadFileChunkCarFileFail
 	errCarUploadFileReferenceObjcetFail
 	errCarUploadFileCidNotEqualRawCid
+	errCarUploadFileInvalidDataFolder
 )
 
 var (
@@ -133,6 +134,7 @@ var (
 	ErrCarUploadFileComputeCarFileHashFail = NewBizError(errCarUploadFileComputeCarFileHashFail, "CAR文件HASH计算失败", "Fail to compute CAR file HASH")
 	ErrCarUploadFileChunkCarFileFail       = NewBizError(errCarUploadFileChunkCarFileFail, "生成CAR文件分片操作失败", "Fail to chunk CAR file")
 	ErrCarUploadFileReferenceObjcetFail    = NewBizError(errCarUploadFileReferenceObjcetFail, "执行CID秒传操作失败", "Fail to reference object by CID")
+	ErrCarUploadFileInvalidDataFolder      = NewBizError(errCarUploadFileInvalidDataFolder, "上传目录为空或者目录中的数据无效", "Uploading folder is empty, or uploading data is invalid in the folder")
 
 	////登录注册
 	//ErrWalletInvalidFailed               = NewBizError(errLogin, "钱包地址非法空", "Invalid wallet")

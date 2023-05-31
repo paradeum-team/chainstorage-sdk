@@ -42,6 +42,9 @@ type Configuration struct {
 
 	// HTTP request user agent (K2请求需要)
 	HttpRequestOvertime int `profile:"httpRequestOvertime" profileDefault:"30" json:"httpRequestOvertime"`
+
+	// CAR version
+	CarVersion int `profile:"carVersion" profileDefault:"1" json:"carVersion"`
 }
 
 type LoggerConf struct {
@@ -107,6 +110,12 @@ func initConfig(config *ApplicationConfig) {
 	httpRequestOvertime := cssConfig.HttpRequestOvertime
 	if httpRequestOvertime <= 0 {
 		cssConfig.HttpRequestOvertime = 30
+	}
+
+	// CAR version
+	carVersion := cssConfig.CarVersion
+	if carVersion <= 0 {
+		cssConfig.CarVersion = 1
 	}
 }
 
