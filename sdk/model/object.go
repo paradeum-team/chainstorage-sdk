@@ -6,7 +6,7 @@ import (
 
 type Object struct {
 	Id                      int                    `json:"id" comment:"对象ID"`
-	UserId                  int                    `json:"userId" comment:"用户ID"`
+	UserId                  int                    `json:"-" comment:"用户ID"`
 	BucketId                int                    `json:"bucketId" comment:"桶主键"`
 	ObjectName              string                 `json:"objectName" comment:"对象名称（255字限制）"`
 	ObjectTypeCode          int                    `json:"objectTypeCode" comment:"对象类型编码"`

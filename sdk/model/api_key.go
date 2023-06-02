@@ -4,7 +4,7 @@ import "time"
 
 type ApiKey struct {
 	Id                            int       `json:"id" comment:"ApiKeyID"`
-	UserId                        int       `json:"userId" comment:"用户ID"`
+	UserId                        int       `json:"-" comment:"用户ID"`
 	ApiName                       string    `json:"apiName" comment:"Api名称（3-63字长度限制）"`
 	ApiKey                        string    `json:"apiKey" comment:"comment:ApiKey（默认20字节）"`
 	ApiSecret                     string    `json:"apiSecret" comment:"Api密钥（默认40字节）"`

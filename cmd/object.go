@@ -106,7 +106,7 @@ func objectListRun(cmd *cobra.Command, args []string) {
 		pageSize = offset
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(&applicationConfig)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -352,7 +352,7 @@ func objectRenameRun(cmd *cobra.Command, args []string) {
 
 	}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(&applicationConfig)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -549,7 +549,7 @@ func objectRemoveRun(cmd *cobra.Command, args []string) {
 	//
 	//}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(&applicationConfig)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)
@@ -743,7 +743,7 @@ func objectDownloadRun(cmd *cobra.Command, args []string) {
 	//
 	//}
 
-	sdk, err := chainstoragesdk.New()
+	sdk, err := chainstoragesdk.New(&applicationConfig)
 	if err != nil {
 		//todo: log detail error?
 		//fmt.Printf("error:%+v\n", err)

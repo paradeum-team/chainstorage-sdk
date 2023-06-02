@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk/sdk"
 	"github.com/spf13/cobra"
 	"os"
 )
+
+var applicationConfig chainstoragesdk.ApplicationConfig
 
 var cmdDescription string = `
 USAGE
@@ -56,6 +59,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	applicationConfig = chainstoragesdk.ApplicationConfig{}
 
 	rootCmd.AddCommand(
 		bucketListCmd,
