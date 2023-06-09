@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk/sdk"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/code"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/consts"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/model"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/utils"
+	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
+	"github.com/paradeum-team/chainstorage-sdk/model"
+	"github.com/paradeum-team/chainstorage-sdk/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/ulule/deepcopier"

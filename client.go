@@ -1,10 +1,10 @@
-package chainstoragesdk
+package sdk
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/model"
+	"github.com/paradeum-team/chainstorage-sdk/model"
 	"net/http"
 	"sync"
 )
@@ -59,13 +59,13 @@ func (c *CssClient) GetIpfsVersion() (model.VersionResponse, error) {
 	// API调用
 	httpStatus, body, err := c.httpClient.RestyGet(apiUrl)
 	if err != nil {
-		c.Logger.logger.Errorf(fmt.Sprintf("API:GetObjectByName:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+		c.Logger.logger.Errorf(fmt.Sprintf("API:GetIpfsVersion:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
 
 		return response, err
 	}
 
 	if httpStatus != http.StatusOK {
-		c.Logger.logger.Errorf(fmt.Sprintf("API:GetObjectByName:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+		c.Logger.logger.Errorf(fmt.Sprintf("API:GetIpfsVersion:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
 
 		return response, errors.New(string(body))
 	}
@@ -73,7 +73,40 @@ func (c *CssClient) GetIpfsVersion() (model.VersionResponse, error) {
 	// 响应数据解析
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		c.Logger.logger.Errorf(fmt.Sprintf("API:GetObjectByName:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+		c.Logger.logger.Errorf(fmt.Sprintf("API:GetIpfsVersion:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (c *CssClient) GetApiVersion() (model.VersionResponse, error) {
+	response := model.VersionResponse{}
+
+	// 请求Url
+	apiBaseAddress := c.Config.ChainStorageApiEndpoint
+	apiPath := "version"
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := c.httpClient.RestyGet(apiUrl)
+	if err != nil {
+		c.Logger.logger.Errorf(fmt.Sprintf("API:GetApiVersion:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		c.Logger.logger.Errorf(fmt.Sprintf("API:GetApiVersion:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		c.Logger.logger.Errorf(fmt.Sprintf("API:GetApiVersion:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
 
 		return response, err
 	}

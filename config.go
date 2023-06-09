@@ -1,4 +1,4 @@
-package chainstoragesdk
+package sdk
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ type Configuration struct {
 	CarFileWorkPath string `profile:"carFileWorkPath" profileDefault:"./tmp/carfile" json:"carFileWorkPath"`
 
 	// CAR文件分片阈值
-	CarFileShardingThreshold int `profile:"carFileShardingThreshold" profileDefault:"10485760" json:"carFileShardingThreshold"`
+	CarFileShardingThreshold int `profile:"carFileShardingThreshold" profileDefault:"46137344" json:"carFileShardingThreshold"`
 
 	// 链存服务API token
 	ChainStorageApiToken string `profile:"chainStorageApiToken" profileDefault:"" json:"chainStorageApiToken"`
@@ -45,6 +45,8 @@ type Configuration struct {
 
 	// CAR version
 	CarVersion int `profile:"carVersion" profileDefault:"1" json:"carVersion"`
+
+	UseHTTPSProtocol bool `profile:"useHttpsProtocol" profileDefault:"true" json:"useHttpsProtocol"`
 }
 
 type LoggerConf struct {
@@ -68,9 +70,17 @@ func initConfig(config *ApplicationConfig) {
 	//check chain-storage-api base address
 	if len(cssConfig.ChainStorageApiEndpoint) > 0 {
 		chainStorageAPIEndpoint := cssConfig.ChainStorageApiEndpoint
-		if !strings.HasPrefix(chainStorageAPIEndpoint, "http") {
-			fmt.Println("ERROR: invalid chain-storage-api endpoint in Configuration, chain-storage-api endpoint must be a valid http/https url, exiting")
-			os.Exit(1)
+		if !strings.HasPrefix(chainStorageAPIEndpoint, "http://") &&
+			!strings.HasPrefix(chainStorageAPIEndpoint, "https://") {
+
+			if cssConfig.UseHTTPSProtocol {
+				cssConfig.ChainStorageApiEndpoint = "https://" + chainStorageAPIEndpoint
+			} else {
+				cssConfig.ChainStorageApiEndpoint = "http://" + chainStorageAPIEndpoint
+			}
+
+			//fmt.Println("ERROR: invalid chain-storage-api endpoint in Configuration, chain-storage-api endpoint must be a valid http/https url, exiting")
+			//os.Exit(1)
 		}
 
 		if !strings.HasSuffix(chainStorageAPIEndpoint, "/") {
@@ -88,11 +98,13 @@ func initConfig(config *ApplicationConfig) {
 		cssConfig.ChainStorageApiToken = "Bearer " + cssConfig.ChainStorageApiToken
 	}
 
-	// CAR文件分片阈值，缺省10MB
-	carFileShardingThreshold := cssConfig.CarFileShardingThreshold
-	if carFileShardingThreshold <= 0 {
-		cssConfig.CarFileShardingThreshold = 10485760
-	}
+	//// CAR文件分片阈值，缺省10MB
+	//carFileShardingThreshold := cssConfig.CarFileShardingThreshold
+	//if carFileShardingThreshold <= 0 {
+	//	cssConfig.CarFileShardingThreshold = 10485760
+	//}
+	// CAR文件分片阈值（固定44Mb）
+	cssConfig.CarFileShardingThreshold = 46137344
 
 	// CAR文件工作目录
 	carFileWorkPath := cssConfig.CarFileWorkPath
@@ -146,16 +158,24 @@ func initConfigWithConfigFile(configFile string) {
 	//check chain-storage-api base address
 	if len(cssConfig.ChainStorageApiEndpoint) > 0 {
 		chainStorageAPIEndpoint := cssConfig.ChainStorageApiEndpoint
-		if !strings.HasPrefix(chainStorageAPIEndpoint, "http") {
-			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
-			os.Exit(1)
+		if !strings.HasPrefix(chainStorageAPIEndpoint, "http://") &&
+			!strings.HasPrefix(chainStorageAPIEndpoint, "https://") {
+
+			if cssConfig.UseHTTPSProtocol {
+				cssConfig.ChainStorageApiEndpoint = "https://" + chainStorageAPIEndpoint
+			} else {
+				cssConfig.ChainStorageApiEndpoint = "http://" + chainStorageAPIEndpoint
+			}
+
+			//fmt.Println("ERROR: invalid chain-storage-api endpoint in Configuration, chain-storage-api endpoint must be a valid http/https url, exiting")
+			//os.Exit(1)
 		}
 
 		if !strings.HasSuffix(chainStorageAPIEndpoint, "/") {
 			cssConfig.ChainStorageApiEndpoint += "/"
 		}
 	} else {
-		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
+		fmt.Println("ERROR: no chain-storage-api endpoint provided in Configuration, at least 1 valid http/https chain-storage-api endpoint must be given, exiting")
 		os.Exit(1)
 	}
 
@@ -199,16 +219,31 @@ func InitConfigWithDefault() {
 	//check chain-storage-api base address
 	if len(cssConfig.ChainStorageApiEndpoint) > 0 {
 		chainStorageAPIEndpoint := cssConfig.ChainStorageApiEndpoint
-		if !strings.HasPrefix(chainStorageAPIEndpoint, "http") {
-			fmt.Println("ERROR: invalid chain-storage-api base address in Configuration file, chain-storage-api base address must be a valid http/https url, exiting")
-			os.Exit(1)
+		if !strings.HasPrefix(chainStorageAPIEndpoint, "http://") &&
+			!strings.HasPrefix(chainStorageAPIEndpoint, "https://") {
+
+			if cssConfig.UseHTTPSProtocol {
+				cssConfig.ChainStorageApiEndpoint = "https://" + chainStorageAPIEndpoint
+			} else {
+				cssConfig.ChainStorageApiEndpoint = "http://" + chainStorageAPIEndpoint
+			}
+
+			//fmt.Println("ERROR: invalid chain-storage-api endpoint in Configuration, chain-storage-api endpoint must be a valid http/https url, exiting")
+			//os.Exit(1)
 		}
 
 		if !strings.HasSuffix(chainStorageAPIEndpoint, "/") {
 			cssConfig.ChainStorageApiEndpoint += "/"
 		}
 	} else {
-		fmt.Println("ERROR: no chain-storage-api base address provided in Configuration file, at least 1 valid http/https chain-storage-api base address must be given, exiting")
+		fmt.Println("ERROR: no chain-storage-api endpoint provided in Configuration, at least 1 valid http/https chain-storage-api endpoint must be given, exiting")
 		os.Exit(1)
+	}
+
+	if len(cssConfig.ChainStorageApiToken) == 0 {
+		fmt.Println("ERROR: invalid chain-storage-api token in Configuration file, chain-storage-api token must not be empty")
+		os.Exit(1)
+	} else if !strings.HasPrefix(cssConfig.ChainStorageApiToken, "Bearer ") {
+		cssConfig.ChainStorageApiToken = "Bearer " + cssConfig.ChainStorageApiToken
 	}
 }

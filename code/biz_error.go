@@ -2,7 +2,7 @@ package code
 
 import (
 	"fmt"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/utils"
+	"github.com/paradeum-team/chainstorage-sdk/utils"
 	"strings"
 )
 
