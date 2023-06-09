@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk/sdk"
+	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk"
 	"github.com/spf13/cobra"
 	"os"
 )

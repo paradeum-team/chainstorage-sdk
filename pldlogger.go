@@ -1,10 +1,10 @@
-package chainstoragesdk
+package sdk
 
 import (
 	"fmt"
 	"github.com/kataras/golog"
-	"github.com/lestrrat-go/file-rotatelogs"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/utils"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/paradeum-team/chainstorage-sdk/utils"
 	"io"
 	"os"
 	"path"

@@ -608,6 +608,12 @@ var BucketPrincipleCodeMapping = map[int]string{
 	BucketPrincipleCodePublic:  "公开",
 }
 
+// 桶策略编码与名称映射关系（英文）
+var BucketPrincipleCodeMappingEn = map[int]string{
+	BucketPrincipleCodePrivate: "private",
+	BucketPrincipleCodePublic:  "public",
+}
+
 //var FileExtensionLinkedStorageObjectMapping = map[string]models.ObjectDocumentMapping{
 //	FileExtensionEmpty:  {Id: 10000, FileExtension: "", DocumentType: "", MimeType: "", LinkedStorageType: "", LinkedStorageTypeName: "其他"},
 //	FileExtensionDir:    {Id: 20000, FileExtension: "", DocumentType: "", MimeType: "", LinkedStorageType: "Directory", LinkedStorageTypeName: "目录"},

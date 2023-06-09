@@ -1,4 +1,4 @@
-package chainstoragesdk
+package sdk
 
 import (
 	"encoding/json"
@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/ipfs/go-cid"
 	"github.com/kataras/golog"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/code"
-	"github.com/paradeum-team/chainstorage-sdk/sdk/model"
+	"github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/model"
 	"net/http"
 	"net/url"
 	"regexp"

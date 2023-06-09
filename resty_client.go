@@ -1,4 +1,4 @@
-package chainstoragesdk
+package sdk
 
 import (
 	"bytes"

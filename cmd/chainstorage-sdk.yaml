@@ -10,7 +10,7 @@ server:
   #HTTP request user agent (K2请求需要)
   httpRequestUserAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
   #HTTP request user agent (K2请求需要)
-  httpRequestOvertime: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+  httpRequestOvertime: 30
 
 logger:
   logPath: ./logs
