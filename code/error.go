@@ -35,6 +35,7 @@ const (
 	errOnlyCreate1BucketForSameStorageNetwork
 	errInvalidBucketId
 	errStorageNetworkCodeMustSet
+	errBucketBindWithGateway
 )
 
 // 文件列表
@@ -111,6 +112,7 @@ var (
 	ErrOnlyCreate1BucketForSameStorageNetwork = NewBizError(errOnlyCreate1BucketForSameStorageNetwork, "基础版本限制，每种网络类型只能创建一个桶", "In the basic version, only one bucket can be created for each network type")
 	ErrInvalidBucketId                        = NewBizError(errInvalidBucketId, "桶ID无效", "invalid bucket ID")
 	ErrStorageNetworkCodeMustSet              = NewBizError(errStorageNetworkCodeMustSet, "存储网络编码设置不正确,请重新尝试", "Incorrect storage network code settings, please try again")
+	ErrBucketBindWithGateway                  = NewBizError(errBucketBindWithGateway, "桶已经与网关绑定，无法删除", "The bucket is bound with gateway and cannot be deleted")
 
 	// 文件列表
 	ErrObjectNotFound                = NewBizError(errObjectNotFound, "该对象数据不存在", "The object data does not exist")
