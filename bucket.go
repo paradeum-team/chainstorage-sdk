@@ -308,8 +308,8 @@ func (b *Bucket) GetStorageNetworkBucketStat(storageNetworkCode int) (model.Buck
 }
 
 // 根据存储类型获取UsersQuota对象
-func (b *Bucket) GetUsersQuotaByStorageNetworkCode(storageNetworkCode int) (model.UsersQuota, error) {
-	response := model.UsersQuota{}
+func (b *Bucket) GetUsersQuotaByStorageNetworkCode(storageNetworkCode int) (model.UsersQuotaResponse, error) {
+	response := model.UsersQuotaResponse{}
 
 	// 参数设置
 	storageNetworkCodeMapping := consts.StorageNetworkCodeMapping

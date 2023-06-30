@@ -74,6 +74,7 @@ const (
 	errCarUploadFileInvalidDataFolder
 	errCarUploadFileExccedObjectAmountUsage
 	errCarUploadFileExccedStorageSpaceUsage
+	errCarUploadFileExccedUploadDirItems
 )
 
 var (
@@ -141,6 +142,7 @@ var (
 	ErrCarUploadFileInvalidDataFolder       = NewBizError(errCarUploadFileInvalidDataFolder, "上传目录为空或者目录中的数据无效", "Uploading folder is empty, or uploading data is invalid in the folder")
 	ErrCarUploadFileExccedObjectAmountUsage = NewBizError(errCarUploadFileExccedObjectAmountUsage, "超过对象存储限制", "Exceed the limitation of object amount")
 	ErrCarUploadFileExccedStorageSpaceUsage = NewBizError(errCarUploadFileExccedStorageSpaceUsage, "超过空间存储限制", "Exceed the limitation of storage space")
+	ErrCarUploadFileExccedUploadDirItems    = NewBizError(errCarUploadFileExccedUploadDirItems, "超过上传文件夹条目限制", "Exceed the limitation of entries in uploading folder")
 
 	////登录注册
 	//ErrWalletInvalidFailed               = NewBizError(errLogin, "钱包地址非法空", "Invalid wallet")

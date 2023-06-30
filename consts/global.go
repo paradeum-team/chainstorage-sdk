@@ -772,12 +772,13 @@ var PinningServiceApiPermissionCodeMapping = map[int]string{
 type ConstraintItem int
 
 const (
-	ConstraintStorageSpace ConstraintItem = iota + 1 //存储空间
-	ConstraintFileLimited                            //文件存储限制
-	ConstraintGateway                                //私有网关限制
-	ConstraintGWFlow                                 //私有网关流量
-	ConstraintGWRequest                              //私有网关请求数限制
-	ConstraintBucket                                 //桶限制
+	ConstraintStorageSpace   ConstraintItem = iota + 1 //存储空间
+	ConstraintFileLimited                              //文件存储限制
+	ConstraintGateway                                  //私有网关限制
+	ConstraintGWFlow                                   //私有网关流量
+	ConstraintGWRequest                                //私有网关请求数限制
+	ConstraintBucket                                   //桶限制
+	ConstraintUploadDirItems                           //上传目录条目限制
 )
 
 func (s ConstraintItem) String() string {
@@ -794,6 +795,8 @@ func (s ConstraintItem) String() string {
 		return "gatewayRequest"
 	case ConstraintBucket:
 		return "bucket"
+	case ConstraintUploadDirItems:
+		return "uploadDirItems"
 	default:
 		return "Unknown"
 	}

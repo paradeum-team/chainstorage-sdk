@@ -21,3 +21,11 @@ type UsersQuota struct {
 	CreatedAt   time.Time           `json:"createdAt" comment:"创建时间"`
 	UpdatedAt   time.Time           `json:"updatedAt" comment:"最后更新时间"`
 }
+
+type UsersQuotaResponse struct {
+	RequestId string     `json:"requestId,omitempty"`
+	Code      int32      `json:"code,omitempty"`
+	Msg       string     `json:"msg,omitempty"`
+	Status    string     `json:"status,omitempty"`
+	Data      UsersQuota `json:"data,omitempty"`
+}
