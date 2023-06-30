@@ -768,3 +768,33 @@ var PinningServiceApiPermissionCodeMapping = map[int]string{
 	PinningServiceApiPermissionCodeGetPinObject:     "getPinObject",
 	PinningServiceApiPermissionCodeReplacePinObject: "replacePinObject",
 }
+
+type ConstraintItem int
+
+const (
+	ConstraintStorageSpace ConstraintItem = iota + 1 //存储空间
+	ConstraintFileLimited                            //文件存储限制
+	ConstraintGateway                                //私有网关限制
+	ConstraintGWFlow                                 //私有网关流量
+	ConstraintGWRequest                              //私有网关请求数限制
+	ConstraintBucket                                 //桶限制
+)
+
+func (s ConstraintItem) String() string {
+	switch s {
+	case ConstraintStorageSpace:
+		return "storageSpace"
+	case ConstraintFileLimited:
+		return "fileLimited"
+	case ConstraintGateway:
+		return "gateway"
+	case ConstraintGWFlow:
+		return "gatewayFlow"
+	case ConstraintGWRequest:
+		return "gatewayRequest"
+	case ConstraintBucket:
+		return "bucket"
+	default:
+		return "Unknown"
+	}
+}

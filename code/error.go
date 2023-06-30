@@ -34,6 +34,7 @@ const (
 	errUserQuotaUpdateFail
 	errOnlyCreate1BucketForSameStorageNetwork
 	errInvalidBucketId
+	errStorageNetworkCodeMustSet
 )
 
 // 文件列表
@@ -71,6 +72,8 @@ const (
 	errCarUploadFileReferenceObjcetFail
 	errCarUploadFileCidNotEqualRawCid
 	errCarUploadFileInvalidDataFolder
+	errCarUploadFileExccedObjectAmountUsage
+	errCarUploadFileExccedStorageSpaceUsage
 )
 
 var (
@@ -103,9 +106,10 @@ var (
 	ErrBucketObjectNotFound                   = NewBizError(errBucketObjectNotFound, "桶内没有该对象数据", "The object data is not in the bucket")
 	ErrBucketVolumnStatFail                   = NewBizError(errBucketVolumnStatFail, "桶容量统计出错，请重试", "Error occurred while calculating bucket capacity, please try again")
 	ErrBucketQuotaFetchFail                   = NewBizError(errBucketQuotaFetchFail, "桶容量配额获取出错，请重试", "Error occurred while getting bucket capacity quota, please try again")
-	ErrUserQuotaUpdateFail                    = NewBizError(errUserQuotaUpdateFail, "桶容量配额获取出错，请重试", "Error occurred while getting bucket capacity quota, please try again")
+	ErrUserQuotaUpdateFail                    = NewBizError(errUserQuotaUpdateFail, "桶容量配额更新出错，请重试", "Error occurred while updating bucket capacity quota, please try again")
 	ErrOnlyCreate1BucketForSameStorageNetwork = NewBizError(errOnlyCreate1BucketForSameStorageNetwork, "基础版本限制，每种网络类型只能创建一个桶", "In the basic version, only one bucket can be created for each network type")
 	ErrInvalidBucketId                        = NewBizError(errInvalidBucketId, "桶ID无效", "invalid bucket ID")
+	ErrStorageNetworkCodeMustSet              = NewBizError(errStorageNetworkCodeMustSet, "存储网络编码设置不正确,请重新尝试", "Incorrect storage network code settings, please try again")
 
 	// 文件列表
 	ErrObjectNotFound                = NewBizError(errObjectNotFound, "该对象数据不存在", "The object data does not exist")
@@ -127,14 +131,16 @@ var (
 	ErrApiKeyPinningServicePermissionMustSet = NewBizError(errApiKeyPinningServicePermissionMustSet, "PinningServiceAPI 权限设置不正确，请重试", "Incorrect PinningServiceAPI permissions setting，please try again")
 
 	// CAR文件上传
-	ErrCarUploadFileFail                   = NewBizError(errCarUploadFileFail, "CAR上传文件失败", "Fail to upload CAR file")
-	ErrCarUploadFileInvalidDataPath        = NewBizError(errCarUploadFileInvalidDataPath, "无效的上传数据路径", "Invalid uploading data path")
-	ErrCarUploadFileCreateCarFileFail      = NewBizError(errCarUploadFileCreateCarFileFail, "创建CAR文件失败", "Fail to create CAR file")
-	ErrCarUploadFileParseCarFileFail       = NewBizError(errCarUploadFileParseCarFileFail, "解析CAR文件失败", "Fail to parse CAR file")
-	ErrCarUploadFileComputeCarFileHashFail = NewBizError(errCarUploadFileComputeCarFileHashFail, "CAR文件HASH计算失败", "Fail to compute CAR file HASH")
-	ErrCarUploadFileChunkCarFileFail       = NewBizError(errCarUploadFileChunkCarFileFail, "生成CAR文件分片操作失败", "Fail to chunk CAR file")
-	ErrCarUploadFileReferenceObjcetFail    = NewBizError(errCarUploadFileReferenceObjcetFail, "执行CID秒传操作失败", "Fail to reference object by CID")
-	ErrCarUploadFileInvalidDataFolder      = NewBizError(errCarUploadFileInvalidDataFolder, "上传目录为空或者目录中的数据无效", "Uploading folder is empty, or uploading data is invalid in the folder")
+	ErrCarUploadFileFail                    = NewBizError(errCarUploadFileFail, "CAR上传文件失败", "Fail to upload CAR file")
+	ErrCarUploadFileInvalidDataPath         = NewBizError(errCarUploadFileInvalidDataPath, "无效的上传数据路径", "Invalid uploading data path")
+	ErrCarUploadFileCreateCarFileFail       = NewBizError(errCarUploadFileCreateCarFileFail, "创建CAR文件失败", "Fail to create CAR file")
+	ErrCarUploadFileParseCarFileFail        = NewBizError(errCarUploadFileParseCarFileFail, "解析CAR文件失败", "Fail to parse CAR file")
+	ErrCarUploadFileComputeCarFileHashFail  = NewBizError(errCarUploadFileComputeCarFileHashFail, "CAR文件HASH计算失败", "Fail to compute CAR file HASH")
+	ErrCarUploadFileChunkCarFileFail        = NewBizError(errCarUploadFileChunkCarFileFail, "生成CAR文件分片操作失败", "Fail to chunk CAR file")
+	ErrCarUploadFileReferenceObjcetFail     = NewBizError(errCarUploadFileReferenceObjcetFail, "执行CID秒传操作失败", "Fail to reference object by CID")
+	ErrCarUploadFileInvalidDataFolder       = NewBizError(errCarUploadFileInvalidDataFolder, "上传目录为空或者目录中的数据无效", "Uploading folder is empty, or uploading data is invalid in the folder")
+	ErrCarUploadFileExccedObjectAmountUsage = NewBizError(errCarUploadFileExccedObjectAmountUsage, "超过对象存储限制", "Exceed the limitation of object amount")
+	ErrCarUploadFileExccedStorageSpaceUsage = NewBizError(errCarUploadFileExccedStorageSpaceUsage, "超过空间存储限制", "Exceed the limitation of storage space")
 
 	////登录注册
 	//ErrWalletInvalidFailed               = NewBizError(errLogin, "钱包地址非法空", "Invalid wallet")

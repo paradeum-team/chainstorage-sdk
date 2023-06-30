@@ -113,3 +113,44 @@ func (c *CssClient) GetApiVersion() (model.VersionResponse, error) {
 
 	return response, nil
 }
+
+//// 按照存储类型获取Bucket容量统计
+//func (c *CssClient) GetStorageNetworkBucketStat(storageNetworkCode int) (model.BucketStorageTypeStatResp, error) {
+//	response := model.BucketStorageTypeStatResp{}
+//
+//	// 参数设置
+//	storageNetworkCodeMapping := consts.StorageNetworkCodeMapping
+//	_, exist := storageNetworkCodeMapping[storageNetworkCode]
+//	if !exist {
+//		return response, code.ErrStorageNetworkCodeMustSet
+//	}
+//
+//	// 请求Url
+//	apiBaseAddress := c.Config.ChainStorageApiEndpoint
+//	apiPath := fmt.Sprintf("api/v1/buckets/stat/%d", storageNetworkCode)
+//	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+//
+//	// API调用
+//	httpStatus, body, err := c.httpClient.RestyGet(apiUrl)
+//	if err != nil {
+//		c.Logger.logger.Errorf(fmt.Sprintf("API:GetStorageNetworkBucketStat:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+//
+//		return response, err
+//	}
+//
+//	if httpStatus != http.StatusOK {
+//		c.Logger.logger.Errorf(fmt.Sprintf("API:GetStorageNetworkBucketStat:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+//
+//		return response, errors.New(string(body))
+//	}
+//
+//	// 响应数据解析
+//	err = json.Unmarshal(body, &response)
+//	if err != nil {
+//		c.Logger.logger.Errorf(fmt.Sprintf("API:GetStorageNetworkBucketStat:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+//
+//		return response, err
+//	}
+//
+//	return response, nil
+//}

@@ -6,6 +6,7 @@ import (
 	"github.com/Code-Hex/pget"
 	chainstoragesdk "github.com/paradeum-team/chainstorage-sdk"
 	sdkcode "github.com/paradeum-team/chainstorage-sdk/code"
+	"github.com/paradeum-team/chainstorage-sdk/consts"
 	"github.com/paradeum-team/chainstorage-sdk/model"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -772,25 +773,30 @@ func objectDownloadRun(cmd *cobra.Command, args []string) {
 	// 对象ID
 	//objectId := response.Data.Id
 	//objectName := response.Data.ObjectName
+	isDir := response.Data.ObjectTypeCode == consts.ObjectTypeCodeDir
 	objectCid := response.Data.ObjectCid
 	downloadEndpoint := "https://test-ipfs-gateway.netwarps.com/ipfs/"
 	downloadUrl := fmt.Sprintf("%s%s", downloadEndpoint, objectCid)
 
-	// todo:
-	downloadUrl = "https://test-ipfs-gateway.netwarps.com/ipfs/bafybeiguyrqm6z76mrhntk64fiwwdpjqv64ny3ugw64owznlbeotknvypa"
-	cli := pget.New()
-	cli.URLs = []string{downloadUrl}
-	cli.Output = objectName
+	if isDir {
 
-	version := "CMD"
+	} else {
+		// todo:
+		downloadUrl = "https://test-ipfs-gateway.netwarps.com/ipfs/bafybeiguyrqm6z76mrhntk64fiwwdpjqv64ny3ugw64owznlbeotknvypa"
+		cli := pget.New()
+		cli.URLs = []string{downloadUrl}
+		cli.Output = objectName
 
-	if err := cli.Run(context.Background(), version, []string{"-t", "30"}); err != nil {
-		if cli.Trace {
-			fmt.Fprintf(os.Stderr, "Error:\n%+v\n", err)
-		} else {
-			fmt.Fprintf(os.Stderr, "Error:\n  %v\n", err)
+		version := "CMD"
+
+		if err := cli.Run(context.Background(), version, []string{"-t", "30"}); err != nil {
+			if cli.Trace {
+				fmt.Fprintf(os.Stderr, "Error:\n%+v\n", err)
+			} else {
+				fmt.Fprintf(os.Stderr, "Error:\n  %v\n", err)
+			}
+			processError("get", err, args)
 		}
-		processError("get", err, args)
 	}
 
 	objectDownloadRunOutput(cmd, args, response)

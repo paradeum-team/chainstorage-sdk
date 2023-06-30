@@ -272,7 +272,7 @@ func (o *Object) IsExistObjectByCid(objectCid string) (model.ObjectExistResponse
 	return response, nil
 }
 
-// 根据CID检查是否已经存在Object
+// 根据对象名称检查是否已经存在Object
 func (o *Object) GetObjectByName(bucketId int, objectName string) (model.ObjectCreateResponse, error) {
 	response := model.ObjectCreateResponse{}
 

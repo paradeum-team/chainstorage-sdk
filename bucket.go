@@ -266,6 +266,88 @@ func (b *Bucket) GetBucketByName(bucketName string) (model.BucketCreateResponse,
 	return response, nil
 }
 
+// 按照存储类型获取Bucket容量统计
+func (b *Bucket) GetStorageNetworkBucketStat(storageNetworkCode int) (model.BucketStorageTypeStatResp, error) {
+	response := model.BucketStorageTypeStatResp{}
+
+	// 参数设置
+	storageNetworkCodeMapping := consts.StorageNetworkCodeMapping
+	_, exist := storageNetworkCodeMapping[storageNetworkCode]
+	if !exist {
+		return response, code.ErrStorageNetworkCodeMustSet
+	}
+
+	// 请求Url
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
+	apiPath := fmt.Sprintf("api/v1/buckets/stat/%d", storageNetworkCode)
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := b.Client.RestyGet(apiUrl)
+	if err != nil {
+		b.logger.Errorf(fmt.Sprintf("API:GetStorageNetworkBucketStat:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		b.logger.Errorf(fmt.Sprintf("API:GetStorageNetworkBucketStat:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		b.logger.Errorf(fmt.Sprintf("API:GetStorageNetworkBucketStat:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
+// 根据存储类型获取UsersQuota对象
+func (b *Bucket) GetUsersQuotaByStorageNetworkCode(storageNetworkCode int) (model.UsersQuota, error) {
+	response := model.UsersQuota{}
+
+	// 参数设置
+	storageNetworkCodeMapping := consts.StorageNetworkCodeMapping
+	_, exist := storageNetworkCodeMapping[storageNetworkCode]
+	if !exist {
+		return response, code.ErrStorageNetworkCodeMustSet
+	}
+
+	// 请求Url
+	apiBaseAddress := b.Config.ChainStorageApiEndpoint
+	apiPath := fmt.Sprintf("api/v1/buckets/quota/%d", storageNetworkCode)
+	apiUrl := fmt.Sprintf("%s%s", apiBaseAddress, apiPath)
+
+	// API调用
+	httpStatus, body, err := b.Client.RestyGet(apiUrl)
+	if err != nil {
+		b.logger.Errorf(fmt.Sprintf("API:GetUsersQuotaByStorageNetworkCode:HttpGet, apiUrl:%s, httpStatus:%d, err:%+v\n", apiUrl, httpStatus, err))
+
+		return response, err
+	}
+
+	if httpStatus != http.StatusOK {
+		b.logger.Errorf(fmt.Sprintf("API:GetUsersQuotaByStorageNetworkCode:HttpGet, apiUrl:%s, httpStatus:%d, body:%s\n", apiUrl, httpStatus, string(body)))
+
+		return response, errors.New(string(body))
+	}
+
+	// 响应数据解析
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		b.logger.Errorf(fmt.Sprintf("API:GetUsersQuotaByStorageNetworkCode:JsonUnmarshal, body:%s, err:%+v\n", string(body), err))
+
+		return response, err
+	}
+
+	return response, nil
+}
+
 // endregion 桶数据
 
 // 检查桶名称
